@@ -1,0 +1,14 @@
+#!/bin/bash
+
+case $1 in
+     version|ver|v)
+          ver=$(</app/defaults/ver)
+          echo "Installed Version is $ver."
+          ;;
+     h|help|man)
+          echo "Help text goes here."
+          ;;
+     *)
+          echo "Hmm, seems i've never head of that cmd or none was set."
+          ;;
+esac

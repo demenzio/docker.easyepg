@@ -1,0 +1,1 @@
+2 3 * * * s6-setuidgid app /bin/bash /app/easyepg/epg.sh

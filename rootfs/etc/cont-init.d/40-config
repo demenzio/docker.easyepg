@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+echo
+echo "Looking for cron job..."
+if [ ! -e /config/epg_refresh-cron ]; then
+    echo "-> ..not found."
+    echo "Loading default setting..."
+    cp /app/defaults/epg_refresh-cron /config/epg_refresh-cron
+    chown app:app /config/epg_refresh-cron
+else
+    echo "-> ...found."
+fi
+echo "Done"
+echo 
+crontab /config/epg_refresh-cron

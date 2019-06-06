@@ -1,0 +1,31 @@
+#!/usr/bin/with-contenv bash
+
+echo
+echo "Checking for XML directory"
+if [ ! -d /config/xml ]; then
+    echo "-> Creating XML dir..."
+    mkdir -p /config/xml
+    chown app:app /config/xml
+else
+    echo "-> ...found."
+fi
+echo "Done"
+echo 
+echo "Checking for XML link"
+if [ ! -d /app/easyepg/xml ]; then
+    echo "-> ...not found."
+    echo "-> Creating link."
+    ln -s /config/xml /app/easyepg/xml 
+else
+    target=/app/easyepg/xml
+    if [ "$(find "$target" -mindepth 1 -print -quit 2>/dev/null)" ]; then
+        echo "ERROR: XML output traget not empty!"
+        echo "Due to safety measures no link has been created."
+    else
+        rm -rf $target
+        echo "-> Creating link..."
+        ln -s /config/xml /app/easyepg/xml
+    fi
+fi
+echo "Done"
+echo
