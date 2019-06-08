@@ -1,0 +1,18 @@
+#!/bin/bash
+
+logpath=/config/logs
+
+if [ -f /config/status/enabled ] && [ ! -f /config/status/disabled ]; then
+    touch $logpath/juggler.log
+    echo "$(date) -> Service is ENABLED - CMD ee gepg" >> $logpath/juggler.log 
+    # TO BE ADDED check for persistent data then do ee gepg
+    ee gepg
+else
+    if [ -f /config/status/disabled ] && [ ! -f /config/status/enabled ]; then
+        touch $logpath/juggler.log
+        echo "$(date) -> Service is DISABELD" >> $logpath/juggler.log 
+    else
+        touch $logpath/juggler.log
+         echo "$(date) -> Error - No Status Setting found. Please restart container." >> $logpath/juggler.log
+    fi
+fi
