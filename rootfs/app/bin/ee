@@ -1,14 +1,101 @@
 #!/bin/bash
 
 case $1 in
-     version|ver|v)
-          ver=$(</app/defaults/ver)
-          echo "Installed Version is $ver."
-          ;;
-     h|help|man)
-          echo "Help text goes here."
-          ;;
-     *)
-          echo "Hmm, seems i've never head of that cmd or none was set."
-          ;;
+    version|ver|v)
+        ver=$(</app/defaults/ver)
+        echo
+        echo "Installed Version is $ver."
+        echo
+    ;;
+    setup|conf|gepg)
+        cd /app/easyepg || exit
+        bash epg.sh
+    ;;
+    xml)
+        if [ `ls -A /data | wc -l` -eq 0 ]; then
+            echo
+            echo "No xml files found. Did the Grabber run or is it even setup already ?"
+            echo
+        else
+            echo
+            ls /data
+            echo
+        fi
+    ;;
+    service)
+        case $2 in
+            1|on)
+                if [ -f /config/status/enabled ]; then
+                    echo
+                    echo "-> Service is already ENABLED"
+                    echo 
+                else
+                    if [ -f /config/status/disabled ]; then
+                    rm /config/status/disabled
+                    touch /config/status/enabled
+                    else
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                    fi
+                fi
+            ;;
+            0|off)
+                if [ -f /config/status/disabled ]; then
+                    echo
+                    echo "-> Service is already DISABLED"
+                    echo 
+                else
+                    if [ -f /config/status/enabled ]; then
+                    rm /config/status/enabled
+                    touch /config/status/disabled
+                    else
+                        echo
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                        echo
+                    fi
+                fi
+            ;;
+            status)
+                if [ -f /config/status/enabled ] && [ ! -f /config/status/disabled ]; then
+                    echo
+                    echo "-> Service is ENABLED"
+                    echo 
+                else
+                    if [ -f /config/status/disabled ] && [ ! -f /config/status/enabled ]; then
+                    echo
+                    echo "-> Service is DISABLED"
+                    echo
+                    else
+                        echo
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                        echo
+                    fi
+                fi
+            ;;
+            *)
+                echo
+                echo "Hmm, seems I've never heard of that cmd or none was set."
+                echo "Try ee help for more information."
+                echo
+            ;;
+        esac
+    ;;
+    h|help|man)
+        echo
+        echo "eASYePG - Helper Script" 
+        echo "Available commands:"
+        echo "version|ver|v - show installed version of easyEPG"
+        echo "setup|conf - run epg.sh"
+        echo "service 0|1|status - Set or view current service status"
+        echo "xml - List existing xml files"
+        echo
+    ;;
+    *)
+        echo
+        echo "Hmm, seems I've never heard of that cmd or none was set."
+        echo "Try ee help for more information."
+        echo
+    ;;
 esac
