@@ -1,11 +1,21 @@
 #!/usr/bin/with-contenv bash
 
-echo
-echo "Checking for XML directory"
-if [ ! -d /config/xml ]; then
-    echo "-> Creating XML dir..."
-    mkdir -p /config/xml
-    chown app:app /config/xml
+echo 
+echo "Checking for log directory"
+if [ ! -d /config/logs ]; then
+    echo "-> Creating logs dir..."
+    mkdir /config/logs
+    chown app:app /config/logs
+else
+    echo "-> ...found."
+fi
+echo "Done"
+echo 
+echo "Checking for data directory"
+if [ ! -d /data ]; then
+    echo "-> Creating data dir..."
+    mkdir /data
+    chown -R app:app /data
 else
     echo "-> ...found."
 fi
@@ -15,7 +25,7 @@ echo "Checking for XML link"
 if [ ! -d /app/easyepg/xml ]; then
     echo "-> ...not found."
     echo "-> Creating link."
-    ln -s /config/xml /app/easyepg/xml 
+    ln -s /data /app/easyepg/xml
 else
     target=/app/easyepg/xml
     if [ "$(find "$target" -mindepth 1 -print -quit 2>/dev/null)" ]; then
@@ -24,8 +34,34 @@ else
     else
         rm -rf $target
         echo "-> Creating link..."
-        ln -s /config/xml /app/easyepg/xml
+        ln -s /data /app/easyepg/xml
     fi
 fi
 echo "Done"
 echo
+echo "Checking for status directory"
+if [ ! -d /config/status ]; then
+    echo "-> Creating status dir..."
+    mkdir -p /config/status
+    echo "Setting default - ENABLED"
+    touch /config/status/enabled
+    chown app:app -R /config/status
+else
+    echo "-> ...found."
+    echo "Checking for status settings"
+    if [ -f /config/status/enabled ] && [ ! -f /config/status/disabled ]; then
+        echo "-> Service is ENABLED"
+    else
+        if [ -f /config/status/disabled ] && [ ! -f /config/status/enabled ]; then
+        echo "-> Service is DISABLED"
+        else
+            echo "No Valid Status Setting found."
+            echo "Setting default - ENABLED"
+            rm -rf /config/status/*
+            touch /config/status/enabled
+            chown app:app touch /config/status/enabled
+        fi
+    fi
+fi
+echo "Done"
+echo 
