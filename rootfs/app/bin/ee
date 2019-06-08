@@ -8,8 +8,7 @@ case $1 in
         echo
     ;;
     setup|conf|gepg)
-        cd /app/easyepg || exit
-        bash epg.sh
+        /app/bin/cron-juggler
     ;;
     xml)
         if [ `ls -A /data | wc -l` -eq 0 ]; then
