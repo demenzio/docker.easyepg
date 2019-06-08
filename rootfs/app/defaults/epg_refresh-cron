@@ -1,1 +1,1 @@
-* * * * * s6-setuidgid app /app/bin/cron-juggler >> /config/logs/juggler-cron.log 2>&1
+2 3 * * * s6-setuidgid app /app/bin/cron-juggler >> /config/logs/juggler-cron.log 2>&1
