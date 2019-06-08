@@ -6,6 +6,7 @@ ARG BUILD_DIR=/tmp/build
 
 ENV APPDIR=/app TZ="Europe/Berlin"
 ENV PATH="${APPDIR}/bin:${PATH}"
+ENV TERM=xterm
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN echo "**** upgrade system ****" && \
