@@ -25,6 +25,7 @@ RUN echo "**** upgrade system ****" && \
             git \
             xml-twig-tools \
             nano \
+            iproute \
             make \
             gcc \
             unzip && \
