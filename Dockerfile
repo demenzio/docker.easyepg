@@ -22,6 +22,7 @@ RUN echo "**** upgrade system ****" && \
             perl-doc \
             jq \
             php \
+            php-curl \
             git \
             xml-twig-tools \
             nano \
