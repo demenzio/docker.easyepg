@@ -2,10 +2,17 @@
 
 case $1 in
     version|ver|v)
-        ver=$(</app/defaults/ver)
-        echo
-        echo "Installed Version is $ver."
-        echo
+        if [ -f /app/defaults/ver ]; then
+            ver=$(</app/defaults/ver)
+            echo
+            echo "Installed Version is $ver."
+            echo
+        else
+            echo
+            echo "Error Code 101 - No Version Set."
+            echo
+        fi
+
     ;;
     setup|conf|gepg)
         /app/bin/cron-juggler
