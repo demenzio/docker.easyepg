@@ -8,7 +8,6 @@ if [ ! -d /config/logs ]; then
 else
     echo "-> ...found."
 fi
-echo "Done"
 echo 
 echo "Checking for data directory"
 if [ ! -d /data ]; then
@@ -17,7 +16,6 @@ if [ ! -d /data ]; then
 else
     echo "-> ...found."
 fi
-echo "Done"
 echo 
 echo "Checking for XML link"
 if [ ! -d /app/easyepg/xml ]; then
@@ -35,7 +33,6 @@ else
         ln -s /data /app/easyepg/xml
     fi
 fi
-echo "Done"
 echo
 echo "Checking for status directory"
 if [ ! -d /config/status ]; then
@@ -59,12 +56,10 @@ else
         fi
     fi
 fi
-echo "Done"
 echo 
 echo "Setting permissions"
 chown -R app:app /config
 chown -R app:app /data
 chown -R app:app /tmp
 ls -l / | grep app
-echo "Done"
 echo 
