@@ -1,4 +1,4 @@
-FROM xuvin/s6overlay:debian-v1.22.1.0
+FROM xuvin/s6overlay:debian-latest
 
 ARG VERSION=0.3.8
 ARG DOWN_LINK=https://github.com/sunsettrack4/easyepg/archive/v${VERSION}.zip
