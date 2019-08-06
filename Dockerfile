@@ -1,6 +1,6 @@
 FROM xuvin/s6overlay:debian-latest
 
-ARG VERSION=0.3.8
+ARG VERSION=0.0.0
 ARG DOWN_LINK=https://github.com/sunsettrack4/easyepg/archive/v${VERSION}.zip
 ARG BUILD_DIR=/tmp/build
 
