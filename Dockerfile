@@ -32,7 +32,7 @@ RUN echo "**** upgrade system ****" && \
             cpanminus \
             build-essential \
             inetutils-ping \
-            iproute2&& \
+            iproute2 && \
     echo "**** CPAN and the required modules to parse JSON files ****" && \
         cpan App:cpanminus && \
         cpanm install JSON && \
