@@ -33,7 +33,7 @@ pipeline{
         }
         stage("Build"){
             steps{
-                sh (label: "Building Container ${registry}:${newVersion}", script: "docker build --pull --no-cache --build-arg VERSION=:${newVersion} -t ${registry}:${newVersion} .")
+                sh (label: "Building Container ${registry}:${newVersion}", script: "docker build --pull --no-cache --build-arg VERSION=${newVersion} -t ${registry}:${newVersion} .")
             }
             post{
                 success{
