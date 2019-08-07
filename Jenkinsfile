@@ -3,7 +3,7 @@ pipeline{
         label "docker && linux"
     }
     environment { 
-        registry = "xuvin/xteve"
+        registry = "xuvin/easyepg"
         registryCredential = 'docker-xuvin-cred'
         pushOverAPIUserKey = credentials('po-userkey')
         pushOverAPIAPPToken = credentials('jenkins-po-key')
