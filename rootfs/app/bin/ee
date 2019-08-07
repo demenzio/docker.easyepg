@@ -82,8 +82,8 @@ case $1 in
             ;;
             *)
                 echo
-                echo "Hmm, seems I've never heard of that cmd or none was set."
-                echo "Try ee help for more information."
+                echo "Please choose a valid sub cmd."
+                echo "Valid cmd are: service 0/1/status"
                 echo
             ;;
         esac
