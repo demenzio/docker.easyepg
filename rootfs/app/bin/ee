@@ -5,7 +5,7 @@ case $1 in
         if [ -f /app/defaults/ver ]; then
             ver=$(</app/defaults/ver)
             echo
-            echo "Installed Version is $ver."
+            echo "Installed Version is $ver"
             echo
         else
             echo
