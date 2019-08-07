@@ -57,9 +57,12 @@ else
     fi
 fi
 echo 
-echo "Setting permissions"
+echo "Setting owner, current settings are:"
 chown -R app:app /config
 chown -R app:app /data
 chown -R app:app /tmp
-ls -l / | grep app
+echo
+ls -l / | grep app | awk 'NR > 1 { print " -> " $1 " " $3 ":" $4 " /" $9 }'
 echo 
+
+printf %s "Done" && printf '%s\n' " OK"
