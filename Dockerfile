@@ -20,31 +20,30 @@ RUN echo "**** upgrade system ****" && \
             wget \
             libxml2-utils \
             perl \
+            nano \
             perl-doc \
             jq \
             php \
             php-curl \
             git \
             xml-twig-tools \
-            nano \
-            iproute2 \
-            make \
-            gcc \
-            unzip && \
+            unzip \
+            liblocal-lib-perl \
+            cpanminus \
+            build-essential \
+            inetutils-ping \
+            iproute2&& \
     echo "**** CPAN and the required modules to parse JSON files ****" && \
-            cpan install CPAN && \
-            cpan App:cpanminus && \
-            cpanm install inc::latest && \
-            cpanm install JSON && \
-            cpanm install XML::Rules && \
-            cpanm install XML::DOM && \
-            cpanm install Data::Dumper && \
-            cpanm install Time::Piece && \
-            cpanm install Time::Seconds && \
-            cpanm install DateTime && \
-            cpanm install DateTime DateTime::TimeZone && \
-            cpanm install DateTime::Format::DateParse && \
-            cpanm install utf8 
+        cpan App:cpanminus && \
+        cpanm install JSON && \
+        cpanm install XML::Rules && \
+        cpanm install XML::DOM && \
+        cpanm install Data::Dumper && \
+        cpanm install Time::Piece && \
+        cpanm install Time::Seconds && \
+        cpanm install DateTime && \
+        cpanm install DateTime::Format::DateParse && \
+        cpanm install utf8
 
 ADD ${DOWN_LINK} ${BUILD_DIR}/
 
