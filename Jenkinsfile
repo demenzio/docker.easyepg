@@ -84,7 +84,7 @@ pipeline{
         stage("Clean Up"){
             steps{
                 sh (label: "Removing Created Docker Images with Tag ${registry}:${newVersion}", script: "docker rmi -f ${registry}:${newVersion} && docker rmi -f ${registry}:latest || exit 0")
-                sh (label: "Cleaning Docker Environment", script: "docker system prune")
+                sh (label: "Cleaning Docker Environment", script: "yes | docker system prune")
             }
             post{
                 success{
@@ -103,10 +103,12 @@ pipeline{
         failure{
             sh (label: 'Sending Notification with Status 2', script: 'curl -s --form-string "token=${pushOverAPIAPPToken}" --form-string "user=${pushOverAPIUserKey}" --form-string "priority=2" --form-string "retry=30" --form-string "expire=10800" --form-string "title=${registry} - Status 2" --form-string "message=Build for ${registry} - Failure" https://api.pushover.net/1/messages.json', returnStdout: true)
             sh (label: "Removing all created images of ${registry}:${newVersion}", script: "docker rmi -f ${registry}:${newVersion} && docker rmi -f ${registry}:latest || exit 0")
+            sh (label: "Cleaning Docker Environment", script: "yes | docker system prune")
         }
         aborted{
             sh (label: 'Sending Notification with Status 1', script: 'curl -s --form-string "token=${pushOverAPIAPPToken}" --form-string "user=${pushOverAPIUserKey}" --form-string "priority=1" --form-string "title=${registry} - Status 1" --form-string "message=Build for ${registry} - Aborted" https://api.pushover.net/1/messages.json', returnStdout: true)
             sh (label: "Removing all created images of ${registry}:${newVersion}", script: "docker rmi -f ${registry}:${newVersion} && docker rmi -f ${registry}:latest || exit 0")
+            sh (label: "Cleaning Docker Environment", script: "yes | docker system prune")
         }
     }
 }
