@@ -82,8 +82,8 @@ case $1 in
             ;;
             *)
                 echo
-                echo "Please choose a valid sub cmd."
-                echo "Valid cmd are: service 0/1/status"
+                echo "Please choose a valid option."
+                cat /app/data/man-service | sed 's/\t/,|,/g' | column -s ',' -t
                 echo
             ;;
         esac
