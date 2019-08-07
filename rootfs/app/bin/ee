@@ -90,25 +90,20 @@ case $1 in
     ;;
     h|help|man)
 
-        divider===============================
-        divider=$divider$divider
-
-        header="\n %-10s %8s %10s %11s\n"
-        format=" %-10s %10s %10s\n"
-
-        width=43
-
-        printf "%$width.${width}s\n" "eASYePG - Helper Script"
-
-        printf "$header" "CMD" "OPTION" "DESCRIPTION"
-
-        printf "%$width.${width}s\n" "$divider"
-
-        printf "$format" \
-        "version|ver|v" "-" "show installed version of easyEPG" \
-        "setup|conf" "-" "run easyEPG Script" \
-        "service" "0|1|status" "Set or view current service status" \
-        "xml" "-" "List existing xml files"
+        if [ -f /app/defaults/ver ]; then
+            ver=$(</app/defaults/ver)
+            echo
+            echo "|~~*~~*~~*~~~~~~~*~~~~*~~*~~*~|"
+            echo "|eASYePG $ver - Helper Script|"
+            echo "|~~*~~*~~*~~~~~~~*~~~~*~~*~~*~|"
+        else
+            echo
+            echo "|~*~~*~~~*~~~*~~~~*~~~~*~~~*~~~*~~*~|"
+            echo "|eASYePG (Error 101) - Helper Script|"
+            echo "|~*~~*~~~*~~~*~~~~*~~~~*~~~*~~~*~~*~|"
+        fi
+        echo
+        cat /app/data/man-help | sed 's/\t/,|,/g' | column -s ',' -t
         echo
     ;;
     *)
