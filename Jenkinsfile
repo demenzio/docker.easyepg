@@ -84,6 +84,7 @@ pipeline{
         stage("Clean Up"){
             steps{
                 sh (label: "Removing Created Docker Images with Tag ${registry}:${newVersion}", script: "docker rmi -f ${registry}:${newVersion} && docker rmi -f ${registry}:latest || exit 0")
+                sh (label: "Cleaning Docker Environment", script: "docker system prune")
             }
             post{
                 success{
