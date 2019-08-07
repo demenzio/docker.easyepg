@@ -89,13 +89,26 @@ case $1 in
         esac
     ;;
     h|help|man)
-        echo
-        echo "eASYePG - Helper Script" 
-        echo "Available commands:"
-        echo "version|ver|v - show installed version of easyEPG"
-        echo "setup|conf - run epg.sh"
-        echo "service 0|1|status - Set or view current service status"
-        echo "xml - List existing xml files"
+
+        divider===============================
+        divider=$divider$divider
+
+        header="\n %-10s %8s %10s %11s\n"
+        format=" %-10s %10s %10s\n"
+
+        width=43
+
+        printf "%$width.${width}s\n" "eASYePG - Helper Script"
+
+        printf "$header" "CMD" "OPTION" "DESCRIPTION"
+
+        printf "%$width.${width}s\n" "$divider"
+
+        printf "$format" \
+        "version|ver|v" "-" "show installed version of easyEPG" \
+        "setup|conf" "-" "run easyEPG Script" \
+        "service" "0|1|status" "Set or view current service status" \
+        "xml" "-" "List existing xml files"
         echo
     ;;
     *)
