@@ -1,0 +1,24 @@
+#!/usr/bin/with-contenv bash
+
+logpath=/config/logs
+
+if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; then
+    touch $logpath/juggler.log
+    echo "$(date) -> BKP Service is ENABLED - Job Started" >> $logpath/juggler.log
+    chown -R app:app /config
+    cd /app/easyepg || exit
+    export TERM=xterm
+    s6-setuidgid app /bin/bash /app/data/scripts/bkp
+    echo "$(date) -> BKP Service is ENABLED - Job Finished" >> $logpath/juggler.log
+    chown -R app:app /config
+else
+    if [ -f /config/status/bkp/disabled ] && [ ! -f /config/status/bkp/enabled ]; then
+        touch $logpath/juggler.log
+        echo "$(date) -> BKP Service is DISABELD" >> $logpath/juggler.log 
+    else
+        touch $logpath/juggler.log
+         echo "$(date) -> Error - No BKP Status Setting for BKP found. Please restart container." >> $logpath/juggler.log
+    fi
+fi
+
+#bkp_provider-list

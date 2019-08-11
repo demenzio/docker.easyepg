@@ -1,0 +1,5 @@
+CMD,OPTION,DESCRIPTION
+=======,======,======================
+service,status,Current service status
+ ,1,Enable service
+ ,0,Disable service

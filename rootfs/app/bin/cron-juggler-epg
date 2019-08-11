@@ -1,0 +1,25 @@
+#!/usr/bin/with-contenv bash
+
+logpath=/config/logs
+
+if [ -f /config/status/epg/enabled ] && [ ! -f /config/status/epg/disabled ]; then
+    touch $logpath/juggler.log
+    echo "$(date) -> EPG Service is ENABLED - Job Started" >> $logpath/juggler.log
+    chown -R app:users /app/easyepg
+    chown -R app:users /tmp
+    # TO BE ADDED check for persistent data then do epg.sh
+    cd /app/easyepg || exit
+    export TERM=xterm
+    s6-setuidgid app /bin/bash /app/easyepg/epg.sh
+    chown -R app:users /app/easyepg
+    chown -R app:users /tmp
+    echo "$(date) -> EPG Service is ENABLED - Job Finished" >> $logpath/juggler.log
+else
+    if [ -f /config/status/epg/disabled ] && [ ! -f /config/status/epg/enabled ]; then
+        touch $logpath/juggler.log
+        echo "$(date) -> EPG Service is DISABELD" >> $logpath/juggler.log 
+    else
+        touch $logpath/juggler.log
+         echo "$(date) -> Error - No EPG Status Setting for EPG found. Please restart container." >> $logpath/juggler.log
+    fi
+fi

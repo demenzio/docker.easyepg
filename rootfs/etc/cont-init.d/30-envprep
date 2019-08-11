@@ -34,26 +34,75 @@ else
     fi
 fi
 echo
-echo "Checking for status directory"
+echo "Checking backup directory:"
+if [ ! -d /config/backup ]; then
+    echo "-> ...not found."
+    echo "->Creating Backup dir."
+    mkdir -p /config/backup
+else
+    target=/app/easyepg/xml
+    if [ "$(find "$target" -mindepth 1 -print -quit 2>/dev/null)" ]; then
+        echo "ERROR: XML output traget not empty!"
+        echo "Due to safety measures no link has been created."
+    else
+        rm -rf $target
+        echo "-> Creating link..."
+        ln -s /data /app/easyepg/xml
+    fi
+fi
+echo
+echo "Checking for status directory:"
 if [ ! -d /config/status ]; then
-    echo "-> Creating status dir..."
+    echo "-> Not Found."
+    echo "-> Creating default services dirs..."
     mkdir -p /config/status
-    echo "Setting default - ENABLED"
-    touch /config/status/enabled
+    mkdir -p /config/status/epg
+    mkdir -p /config/status/bkp
+    echo "-> Setting default - ENABLED"
+    touch /config/status/epg/enabled
+    touch /config/status/bkp/enabled
 else
     echo "-> ...found."
-    echo "Checking for status settings"
-    if [ -f /config/status/enabled ] && [ ! -f /config/status/disabled ]; then
-        echo "-> Service is ENABLED"
-    else
-        if [ -f /config/status/disabled ] && [ ! -f /config/status/enabled ]; then
-        echo "-> Service is DISABLED"
+    echo "Checking for services settings:"
+    echo "-> EPG:"
+    if [ -d /config/status/epg ]; then
+        if [ -f /config/status/epg/enabled ] && [ ! -f /config/status/epg/disabled ]; then
+            echo "--> Service is ENABLED"
         else
-            echo "No Valid Status Setting found."
-            echo "Setting default - ENABLED"
-            rm -rf /config/status/*
-            touch /config/status/enabled
+            if [ -f /config/status/epg/disabled ] && [ ! -f /config/status/epg/enabled ]; then
+                echo "--> Service is DISABLED"
+            else
+                echo "--> No Valid Status Setting found."
+                echo "--> Setting default - ENABLED"
+                rm -rf /config/status/epg/*
+                touch /config/status/epg/enabled
+            fi
         fi
+    else
+        echo "--> No EPG Service found."
+        echo "--> Creating service with default setting - ENABLED"
+        mkdir -p /config/status/epg
+        touch /config/status/epg/enabled
+    fi
+    echo "-> BKP:"
+        if [ -d /config/status/bkp ]; then
+        if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; then
+            echo "--> Service is ENABLED"
+        else
+            if [ -f /config/status/bkp/disabled ] && [ ! -f /config/status/bkp/enabled ]; then
+                echo "--> Service is DISABLED"
+            else
+                echo "--> No Valid Status Setting found."
+                echo "--> Setting default - ENABLED"
+                rm -rf /config/status/bkp/*
+                touch /config/status/bkp/enabled
+            fi
+        fi
+    else
+        echo "--> No BKP Service found."
+        echo "--> Creating service with default setting - ENABLED"
+        mkdir -p /config/status/bkp
+        touch /config/status/bkp/enabled
     fi
 fi
 echo 
@@ -64,5 +113,10 @@ chown -R app:app /tmp
 echo
 ls -l / | grep app | awk 'NR > 1 { print " -> " $1 " " $3 ":" $4 " /" $9 }'
 echo 
-
+echo "Setting scripts permission, current settings are:"
+for f in /app/data/scripts/* ; do chmod +x "$f" ; done
+echo
+ls -l /app/data/scripts | awk 'NR > 1 { print " -> " $1 " " $3 ":" $4 " /" $9 }'
+echo
 printf %s "Done" && printf '%s\n' " OK"
+echo

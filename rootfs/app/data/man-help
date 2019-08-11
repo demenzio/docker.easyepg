@@ -1,8 +1,0 @@
-CMD,OPTION,DESCRIPTION
-===,======,===========
-version|ver|v,-,Show installed version of easyEPG
-setup|conf,-,Run easyEPG Script
-service,status,View current service status
- ,1,Enable service
- ,0,Disable service
-xml,-,List existing xml files

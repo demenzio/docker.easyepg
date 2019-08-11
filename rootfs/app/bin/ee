@@ -15,7 +15,7 @@ case $1 in
 
     ;;
     setup|conf|gepg)
-        /app/bin/cron-juggler
+        /app/bin/cron-juggler-epg
     ;;
     xml)
         if [ `ls -A /data | wc -l` -eq 0 ]; then
@@ -31,14 +31,14 @@ case $1 in
     service)
         case $2 in
             1|on)
-                if [ -f /config/status/enabled ]; then
+                if [ -f /config/status/epg/enabled ]; then
                     echo
                     echo "-> Service is already ENABLED"
                     echo 
                 else
-                    if [ -f /config/status/disabled ]; then
-                    rm /config/status/disabled
-                    touch /config/status/enabled
+                    if [ -f /config/status/epg/disabled ]; then
+                    rm /config/status/epg/disabled
+                    touch /config/status/epg/enabled
                     else
                         echo "Error - No Status Setting found."
                         echo "Please restart container."
@@ -46,14 +46,14 @@ case $1 in
                 fi
             ;;
             0|off)
-                if [ -f /config/status/disabled ]; then
+                if [ -f /config/status/epg/disabled ]; then
                     echo
                     echo "-> Service is already DISABLED"
                     echo 
                 else
-                    if [ -f /config/status/enabled ]; then
-                    rm /config/status/enabled
-                    touch /config/status/disabled
+                    if [ -f /config/status/epg/enabled ]; then
+                    rm /config/status/epg/enabled
+                    touch /config/status/epg/disabled
                     else
                         echo
                         echo "Error - No Status Setting found."
@@ -63,12 +63,12 @@ case $1 in
                 fi
             ;;
             status)
-                if [ -f /config/status/enabled ] && [ ! -f /config/status/disabled ]; then
+                if [ -f /config/status/epg/enabled ] && [ ! -f /config/status/epg/disabled ]; then
                     echo
                     echo "-> Service is ENABLED"
                     echo 
                 else
-                    if [ -f /config/status/disabled ] && [ ! -f /config/status/enabled ]; then
+                    if [ -f /config/status/epg/disabled ] && [ ! -f /config/status/epg/enabled ]; then
                     echo
                     echo "-> Service is DISABLED"
                     echo
@@ -83,7 +83,165 @@ case $1 in
             *)
                 echo
                 echo "Please choose a valid option."
-                cat /app/data/man-service | sed 's/\t/,|,/g' | column -s ',' -t
+                echo
+                cat /app/data/man/service | sed 's/\t/,|,/g' | column -s ',' -t
+                echo
+            ;;
+        esac
+    ;;
+    backup|bkp)
+        case $2 in
+            1|on)
+                if [ -f /config/status/bkp/enabled ]; then
+                    echo
+                    echo "-> Service is already ENABLED"
+                    echo 
+                else
+                    if [ -f /config/status/bkp/disabled ]; then
+                    rm /config/status/bkp/disabled
+                    touch /config/status/bkp/enabled
+                    else
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                    fi
+                fi
+            ;;
+            0|off)
+                if [ -f /config/status/bkp/disabled ]; then
+                    echo
+                    echo "-> Service is already DISABLED"
+                    echo 
+                else
+                    if [ -f /config/status/bkp/enabled ]; then
+                    rm /config/status/bkp/enabled
+                    touch /config/status/bkp/disabled
+                    else
+                        echo
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                        echo
+                    fi
+                fi
+            ;;
+            status)
+                if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; then
+                    echo
+                    echo "-> Service is ENABLED"
+                    echo 
+                else
+                    if [ -f /config/status/bkp/disabled ] && [ ! -f /config/status/bkp/enabled ]; then
+                    echo
+                    echo "-> Service is DISABLED"
+                    echo
+                    else
+                        echo
+                        echo "Error - No Status Setting found."
+                        echo "Please restart container."
+                        echo
+                    fi
+                fi
+            ;;
+            load)
+                case $3 in
+                    1)
+                        echo
+                        echo "Load BackUp 1 from {DATE}? y/n"
+                        echo "PLACEHODLER"
+                        echo
+                    ;;
+                    2)
+                        echo
+                        echo "Load BackUp 2 from {DATE}? y/n"
+                        echo "PLACEHODLER"
+                        echo
+                    ;;
+                    3)
+                        echo
+                        echo "Load BackUp 3 from {DATE}? y/n"
+                        echo "PLACEHODLER"
+                        echo
+                    ;;
+                    *)
+                        echo
+                        echo "Please choose a valid option."
+                        cat /app/data/man/backup | sed 's/\t/,|,/g' | column -s ',' -t
+                        echo
+                    ;;
+                esac
+            ;;
+            now)
+                echo
+                read -p "Do you wish to run a backup right now? (Y/N) " yn
+                case $yn in
+                    [Yy]* ) /bin/bash /app/bin/cron-juggler-bkp;;
+                    [Nn]* ) echo && exit;;
+                    * ) echo "-> Please answer yes or no.";;
+                esac
+                echo
+            ;;
+            reset)
+                echo
+                read -p "Do you wish to reset your backup directory? (Y/N) " yn
+                case $yn in
+                    [Yy]* )
+                        if [ ! -d /config/backup ]; then
+                            echo
+                            echo "No backup location found. Please restart container."
+                        else
+                            if [ -d /config/backup.old ]; then
+                                rm -rf /config/backup.old
+                                mv /config/backup /config/backup.old
+                                mkdir /config/backup
+                                chown -R app:app /config
+                                echo "-> Done"
+                                echo
+                            else
+                                mv /config/backup /config/backup.old
+                                mkdir /config/backup
+                                chown -R app:app /config
+                                echo "-> Done"
+                                echo
+                            fi
+                        fi
+                        ;;
+                    [Nn]* ) echo && exit;;
+                    * ) echo "-> Please answer yes or no.";;
+                esac
+                echo
+            ;;
+            restore)
+                echo
+                read -p "Do you wish to restore your backup from before of the last reset run? (Y/N) " yn
+                case $yn in
+                    [Yy]* )
+                        if [ ! -d /config/backup.old ]; then
+                            echo
+                            echo "No old backup found. Have you used the reset cmd?"
+                        else
+                            if [ -d /config/backup ]; then
+                                rm -rf /config/backup
+                                mv /config/backup.old /config/backup
+                                chown -R app:app /config
+                                echo "-> Done"
+                                echo
+                            else
+                                mv /config/backup.old /config/backup
+                                chown -R app:app /config
+                                echo "-> Done"
+                                echo
+                            fi
+                        fi
+                        ;;
+                    [Nn]* ) echo && exit;;
+                    * ) echo "-> Please answer yes or no.";;
+                esac
+                echo
+            ;;
+            *)
+                echo
+                echo "Please choose a valid option."
+                echo
+                cat /app/data/man/backup | sed 's/\t/,|,/g' | column -s ',' -t
                 echo
             ;;
         esac
@@ -103,13 +261,13 @@ case $1 in
             echo "|~*~~*~~~*~~~*~~~~*~~~~*~~~*~~~*~~*~|"
         fi
         echo
-        cat /app/data/man-help | sed 's/\t/,|,/g' | column -s ',' -t
+        cat /app/data/man/help | sed 's/\t/,|,/g' | column -s ',' -t
         echo
     ;;
     *)
         echo
-        echo "Hmm, seems I've never heard of that cmd or none was set."
-        echo "Try ee help for more information."
+        echo "Please choose a valid cmd."
+        cat /app/data/man/help | sed 's/\t/,|,/g' | column -s ',' -t
         echo
     ;;
 esac

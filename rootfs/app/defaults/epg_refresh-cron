@@ -1,1 +1,1 @@
-2 3 * * * /bin/bash /app/bin/cron-juggler
+2 3 * * * /bin/bash /app/bin/cron-juggler-epg

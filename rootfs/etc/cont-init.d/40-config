@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bash
 
 echo
-echo "Looking for cron job..."
+echo "Looking for epg cron job..."
 if [ ! -e /config/epg_refresh-cron ]; then
     echo "-> ..not found."
     echo "Loading default setting..."
@@ -13,3 +13,25 @@ fi
 echo "Done"
 echo 
 crontab /config/epg_refresh-cron
+echo "Looking for bkp cron job..."
+if [ ! -e /config/bkp_run-cron ]; then
+    echo "-> ..not found."
+    echo "Loading default setting..."
+    cp /app/defaults/bkp_run-cron /config/bkp_run-cron
+    chown app:app /config/bkp_run-cron
+else
+    echo "-> ...found."
+fi
+echo "Done"
+echo 
+crontab /config/bkp_run-cron
+echo 
+echo "Setting owner, current settings are:"
+chown -R app:app /config
+chown -R app:app /data
+chown -R app:app /tmp
+echo
+ls -l / | grep app | awk 'NR > 1 { print " -> " $1 " " $3 ":" $4 " /" $9 }'
+echo 
+printf %s "Done" && printf '%s\n' " OK"
+echo

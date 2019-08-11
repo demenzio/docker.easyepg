@@ -1,0 +1,332 @@
+#!/usr/bin/with-contenv bash
+logpath=/config/logs
+target=/config/backup
+#declare -a providers=(0 1 2 3 4)
+
+echo 
+echo "Looking for backup location..."
+echo
+if [ ! -d ${target} ]; then
+    echo "-> ...not found."
+    echo "-> Please Restart Container to reinitialize environment."
+    echo "$(date) --> Error - Default backup location not found. Restart Container to to reinitialize environment." >> $logpath/juggler.log
+else
+    echo "Looking for providerlist..."
+    echo
+    if [ ! -f /app/defaults/providers/all ]; then
+        echo "-> ...not found."
+        echo "-> Please recreate Container from image."
+        echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
+    else
+        if [ "$(ls -A $target)" ]; then
+            #not empty
+            if [ -d ${target}/version1 ] && [ ! -d ${target}/version2 ] && [ ! -d ${target}/version3 ]; then # VERSION2
+                echo "-> VERSION 1 found. No VERSION 2 and 3 existing. Bumping VERSION 1 to VERSION 2 and backing up new VERSION 1"
+                echo "$(date) --> VERSION 1 found. No VERSION 2 and 3 existing. Bumping VERSION 1 to VERSION 2 and backing up new VERSION 1" >> $logpath/juggler.log
+                echo
+                echo "-> Starting Sequence 1->2|->1"
+                echo "$(date) --> Starting Sequence 1->2|->1" >> $logpath/juggler.log
+                mv ${target}/version1 ${target}/version2
+                echo "-> Sequence Part One - 1->2 - DONE"
+                echo "$(date) --> Sequence Part One - 1->2 - DONE" >> $logpath/juggler.log
+                echo
+                echo "-> Starting Sequence ->1"
+                echo "$(date) --> Starting Sequence ->1" >> $logpath/juggler.log
+                mkdir -p ${target}/version1
+                readarray -t providers < /app/defaults/providers/all
+                for p in "${providers[@]}"
+                    do  
+                        if [ ! -d /app/easyepg/$p ]; then
+                            echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                            echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                            echo
+                        else
+                            readarray -t locations < /app/defaults/providers/$p
+                            for l in "${locations[@]}"
+                                do  
+                                    if [ ! -d /app/easyepg/$p/$l ]; then
+                                        echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?"
+                                        echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
+                                        echo
+                                    else
+                                        case $3 in
+                                            full)
+                                                echo "-> Starting full backup of ${p}/${l}..."
+                                                echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                echo "-> Backup of ${p}/${l} completeted."
+                                                echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;
+                                            channel)
+                                                echo "-> Starting channel backup of ${p}/${l}..."
+                                                echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                echo "-> Backup of ${p}/${l} completeted."
+                                                echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;
+                                            *)
+                                                echo "-> Starting full backup of ${p}/${l}..."
+                                                echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                echo "-> Full backup of ${p}/${l} completeted."
+                                                echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;                                    
+                                        esac
+                                    fi
+                            done
+                        fi
+                done
+                echo "-> Sequence Part Two - ->1 - DONE"
+                echo "$(date) --> Sequence Part Two - ->1 - DONE" >> $logpath/juggler.log
+                echo
+                echo "-> BackUp VERSION1 - Complete"
+                echo "$(date) --> BackUp VERSION1 - Complete" >> $logpath/juggler.log
+            else
+                if [ -d ${target}/version1 ] && [ -d ${target}/version2 ] && [ ! -d ${target}/version3 ]; then # VERSION3
+                    echo "-> VERSION 1 and VERSION 2 found. No 3 existing. Bumping VERSION 2 to VERSION 3, VERSION 1 to VERSION 2 and backing up new VERSION 1"
+                    echo "$(date) --> VERSION 1 and VERSION 2 found. No 3 existing. Bumping VERSION 2 to VERSION 3, VERSION 1 to VERSION 2 and backing up new VERSION 1" >> $logpath/juggler.log
+                    echo
+                    echo "-> Starting Sequence 2->3|1->2|->1"
+                    echo "$(date) --> Starting Sequence 2->3|1->2|->1" >> $logpath/juggler.log
+                    mv ${target}/version2 ${target}/version3
+                    echo "-> Sequence Part One - 2->3 - DONE"
+                    echo "$(date) --> Sequence Part One - 2->3 - DONE" >> $logpath/juggler.log
+                    echo
+                    mv ${target}/version1 ${target}/version2
+                    echo "-> Sequence Part Two - 1->2 - DONE"
+                    echo "$(date) --> Sequence Part Two - 1->2 - DONE" >> $logpath/juggler.log
+                    echo
+                    echo "-> Starting Sequence ->1"
+                    echo "$(date) --> Starting Sequence ->1" >> $logpath/juggler.log
+                    mkdir -p ${target}/version1
+                    readarray -t providers < /app/defaults/providers/all
+                    for p in "${providers[@]}"
+                        do  
+                            if [ ! -d /app/easyepg/$p ]; then
+                                echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                                echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                                echo
+                            else
+                                readarray -t locations < /app/defaults/providers/$p
+                                for l in "${locations[@]}"
+                                    do  
+                                        if [ ! -d /app/easyepg/$p/$l ]; then
+                                            echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?"
+                                            echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
+                                            echo
+                                        else
+                                            case $3 in
+                                                full)
+                                                    echo "-> Starting full backup of ${p}/${l}..."
+                                                    echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                    echo "-> Backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;
+                                                channel)
+                                                    echo "-> Starting channel backup of ${p}/${l}..."
+                                                    echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                    echo "-> Backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;
+                                                *)
+                                                    echo "-> Starting full backup of ${p}/${l}..."
+                                                    echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                    echo "-> Full backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;                                    
+                                            esac
+                                        fi
+                                done
+                            fi
+                    done
+                    echo "-> Sequence Part Three - ->1 - DONE"
+                    echo "$(date) --> Sequence Part Three - ->1 - DONE" >> $logpath/juggler.log
+                    echo
+                    echo "-> BackUp VERSION1 - Complete"
+                    echo "$(date) --> BackUp VERSION1 - Complete" >> $logpath/juggler.log
+                else
+                    if [ -d ${target}/version1 ] && [ -d ${target}/version2 ] && [ -d ${target}/version3 ]; then # VERSION3+
+                        echo "-> VERSION 1, VERSION 2 and VERSION 3 found. Removing VERSION3, Bumping VERSION 2 to VERSION 3, VERSION 1 to VERSION 2 and backing up new VERSION 1"
+                        echo "$(date) --> VERSION 1, VERSION 2 and VERSION 3 found. Removing VERSION3, Bumping VERSION 2 to VERSION 3, VERSION 1 to VERSION 2 and backing up new VERSION 1" >> $logpath/juggler.log
+                        echo
+                        echo "-> Starting Sequence -3|2->3|1->2|->1"
+                        echo "$(date) --> Starting Sequence 2->3|1->2|->1" >> $logpath/juggler.log
+                        mv ${target}/version3 ${target}/version4
+                        echo "-> Sequence Part One - -3 - DONE"
+                        echo "$(date) --> Sequence Part One - -3 - DONE" >> $logpath/juggler.log
+                        echo
+                        mv ${target}/version2 ${target}/version3
+                        echo "-> Sequence Part Two - 2->3 - DONE"
+                        echo "$(date) --> Sequence Part Two - 2->3 - DONE" >> $logpath/juggler.log
+                        echo
+                        mv ${target}/version1 ${target}/version2
+                        echo "-> Sequence Part Three - 1->2 - DONE"
+                        echo "$(date) --> Sequence Part Three - 1->2 - DONE" >> $logpath/juggler.log
+                        echo
+                        echo "-> Starting Sequence ->1"
+                        echo "$(date) --> Starting Sequence ->1" >> $logpath/juggler.log
+                        mkdir -p ${target}/version1
+                        readarray -t providers < /app/defaults/providers/all
+                        for p in "${providers[@]}"
+                            do  
+                                if [ ! -d /app/easyepg/$p ]; then
+                                    echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                                    echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                                    echo
+                                else
+                                    readarray -t locations < /app/defaults/providers/$p
+                                    for l in "${locations[@]}"
+                                        do  
+                                            if [ ! -d /app/easyepg/$p/$l ]; then
+                                                echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?"
+                                                echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
+                                                echo
+                                            else
+                                                case $3 in
+                                                    full)
+                                                        echo "-> Starting full backup of ${p}/${l}..."
+                                                        echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                        echo "-> Backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;
+                                                    channel)
+                                                        echo "-> Starting channel backup of ${p}/${l}..."
+                                                        echo "$(date) --> Backup channel of ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                        echo "-> Backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;
+                                                    *)
+                                                        echo "-> Starting full backup of ${p}/${l}..."
+                                                        echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                        echo "-> Full backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;                                    
+                                                esac
+                                            fi
+                                    done
+                                fi
+                        done
+                        echo "-> Sequence Part Four - ->1 - DONE"
+                        echo "$(date) --> Sequence Part Three - ->1 - DONE" >> $logpath/juggler.log
+                        echo
+                        rm -rf ${target}/version4
+                        echo "-> Sequence Part Five - -4 - DONE"
+                        echo "$(date) --> Sequence Part Five - -4 - DONE" >> $logpath/juggler.log
+                        echo
+                        echo "-> BackUp VERSION1 - Complete"
+                        echo "$(date) --> BackUp VERSION1 - Complete" >> $logpath/juggler.log
+                    else
+                        echo "-> No valid environment found. Please run -> ee bkp reset"
+                        echo "$(date) --> Error - No valid environment found. Please run -> ee bkp reset" >> $logpath/juggler.log
+                    fi
+                fi
+            fi
+        else # VERSION1 (folder empty)
+            echo "-> No prior versions found. Backing up as VERSION 1"
+            echo "$(date) --> No prior versions found. Backing up as VERSION 1" >> $logpath/juggler.log
+            echo "-> Starting backup as VERSION1"
+            echo "$(date) --> Starting backup as VERSION1" >> $logpath/juggler.log
+            echo
+            mkdir -p ${target}/version1
+            readarray -t providers < /app/defaults/providers/all
+            for p in "${providers[@]}"
+                do  
+                    if [ ! -d /app/easyepg/$p ]; then
+                        echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                        echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                        echo
+                    else
+                        readarray -t locations < /app/defaults/providers/$p
+                        for l in "${locations[@]}"
+                            do  
+                                if [ ! -d /app/easyepg/$p/$l ]; then
+                                    echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?"
+                                    echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
+                                    echo
+                                else
+                                    case $3 in
+                                        full)
+                                            echo "-> Starting full backup of ${p}/${l}..."
+                                            echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                mkdir ${target}/version1/${p}
+                                            fi
+                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                            echo "-> Backup of ${p}/${p}/${l} completeted."
+                                            echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                            echo
+                                        ;;
+                                        channel)
+                                            echo "-> Starting channel backup of ${p}/${l}..."
+                                            echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                mkdir ${target}/version1/${p}
+                                            fi
+                                            cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                            echo "-> Backup of ${p}/${p}/${l} completeted."
+                                            echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                            echo
+                                        ;;
+                                        *)
+                                            echo "-> Starting full backup of ${p}/${l}..."
+                                            echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
+                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                mkdir ${target}/version1/${p}
+                                            fi
+                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                            echo "-> Full backup of ${p}/${p}/${l} completeted."
+                                            echo "$(date) --> Full backup of ${p} completeted." >> $logpath/juggler.log
+                                            echo
+                                        ;;                                    
+                                    esac
+                                fi
+                        done
+                    fi
+            done
+            echo "-> BackUp VERSION1 - Complete"
+            echo "$(date) --> BackUp VERSION1 - Complete" >> $logpath/juggler.log
+        fi
+    fi
+fi

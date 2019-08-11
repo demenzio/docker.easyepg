@@ -1,0 +1,16 @@
+CMD,OPTION,DESCRIPTION
+=============,================,=============================
+backup|bkp,status,Current service status
+ ,1,Enable service
+ ,0,Disable service
+ ,load 1/2/3,Load back up version x
+ , ,(1 is the most recent)
+ ,now full/channel,Do back up right now
+ ,reset,Reinitialize folder structure
+ ,restore,Undo reset
+service,status,Current service status
+ ,1,Enable service
+ ,0,Disable service
+setup|conf,-,Run easyEPG Script
+version|ver|v,-,Show version of easyEPG
+xml,-,List existing xml files
