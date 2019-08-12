@@ -184,13 +184,69 @@ case $1 in
                     ;;
                 esac
             ;;
+            mode)
+                case $3 in
+                    full)
+                        echo
+                        echo "-> Selected FULL backup mode as default."
+                        touch /config/bkp.mode
+                        echo ${3} > /config/bkp.mode
+                        echo
+                    ;;
+                    channel)
+                        echo
+                        echo "-> Selected mode - CHANNEL backup."
+                        touch /config/bkp.mode
+                        echo "${3}" > /config/bkp.mode
+                        echo
+                    ;;
+                    *)
+                        echo
+                        echo "-> No valid backup mode selected. Selected default mode - FULL backup."
+                        echo "-> Valid options are: full / channel"
+                        touch /config/bkp.mode
+                        echo "full" > /config/bkp.mode
+                        echo
+                    ;;
+                esac 
+            ;;
             now)
+                case $3 in
+                    full)
+                        echo
+                        echo "-> Selected mode - FULL backup."
+                        touch /config/now.mode
+                        echo "1" > /config/now.mode
+                        touch /config/current.mode
+                        echo "${3}" > /config/current.mode
+                        echo
+                    ;;
+                    channel)
+                        echo
+                        echo "-> Selected mode - CHANNEL backup."
+                        touch /config/now.mode
+                        echo "1" > /config/now.mode
+                        touch /config/current.mode
+                        echo "${3}" > /config/current.mode
+                        echo
+                    ;;
+                    *)
+                        echo
+                        echo "-> No valid backup mode selected. Selected default mode - FULL backup."
+                        echo "-> Valid options are: full / channel"
+                        touch /config/now.mode
+                        echo "1" > /config/now.mode
+                        touch /config/current.mode
+                        echo "full" > /config/current.mode
+                        echo
+                    ;;
+                esac  
                 echo
                 read -p "Do you wish to run a backup right now? (Y/N) " yn
                 case $yn in
                     [Yy]* ) /bin/bash /app/bin/cron-juggler-bkp;;
-                    [Nn]* ) echo && exit;;
-                    * ) echo "-> Please answer yes or no.";;
+                    [Nn]* ) echo "0" > /config/now.mode && echo && exit;;
+                    * ) echo "0" > /config/now.mode && echo "-> Please answer yes or no.";;
                 esac
                 echo
             ;;

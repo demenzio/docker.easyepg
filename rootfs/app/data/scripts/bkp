@@ -49,41 +49,50 @@ else
                                         echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
                                         echo
                                     else
-                                        case $3 in
-                                            full)
-                                                echo "-> Starting full backup of ${p}/${l}..."
-                                                echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                if [ ! -d ${target}/version1/${p} ]; then
-                                                    mkdir ${target}/version1/${p}
-                                                fi
-                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                echo "-> Backup of ${p}/${l} completeted."
-                                                echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                echo
-                                            ;;
-                                            channel)
-                                                echo "-> Starting channel backup of ${p}/${l}..."
-                                                echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
-                                                if [ ! -d ${target}/version1/${p} ]; then
-                                                    mkdir ${target}/version1/${p}
-                                                fi
-                                                cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
-                                                echo "-> Backup of ${p}/${l} completeted."
-                                                echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                echo
-                                            ;;
-                                            *)
-                                                echo "-> Starting full backup of ${p}/${l}..."
-                                                echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                if [ ! -d ${target}/version1/${p} ]; then
-                                                    mkdir ${target}/version1/${p}
-                                                fi
-                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                echo "-> Full backup of ${p}/${l} completeted."
-                                                echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                echo
-                                            ;;                                    
-                                        esac
+                                        if [ -f /config/current.mode ]; then
+                                            read modeCURRENT < /config/current.mode
+                                            case $modeCURRENT in
+                                                full)
+                                                    echo "-> Starting full backup of ${p}/${l}..."
+                                                    echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                    echo "-> Backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;
+                                                channel)
+                                                    echo "-> Starting channel backup of ${p}/${l}..."
+                                                    echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    if [ ! -d ${target}/version1/${p}/${l} ]; then
+                                                        mkdir ${target}/version1/${p}/${l}
+                                                    fi
+                                                    cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                    echo "-> Backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;
+                                                *)
+                                                    echo "-> Starting DEFAULT backup of ${p}/${l}..."
+                                                    echo "$(date) --> DEFAULT backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                    if [ ! -d ${target}/version1/${p} ]; then
+                                                        mkdir ${target}/version1/${p}
+                                                    fi
+                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                    echo "-> DEFAULT backup of ${p}/${l} completeted."
+                                                    echo "$(date) --> DEFAULT backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                    echo
+                                                ;;                                    
+                                            esac
+                                        else
+                                            echo "-> Error 104 - No current.mode found."
+                                            echo "$(date) --> Error 104 - No current.mode found." >> $logpath/juggler.log
+                                        fi
                                     fi
                             done
                         fi
@@ -127,41 +136,50 @@ else
                                             echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
                                             echo
                                         else
-                                            case $3 in
-                                                full)
-                                                    echo "-> Starting full backup of ${p}/${l}..."
-                                                    echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                    if [ ! -d ${target}/version1/${p} ]; then
-                                                        mkdir ${target}/version1/${p}
-                                                    fi
-                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                    echo "-> Backup of ${p}/${l} completeted."
-                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                    echo
-                                                ;;
-                                                channel)
-                                                    echo "-> Starting channel backup of ${p}/${l}..."
-                                                    echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
-                                                    if [ ! -d ${target}/version1/${p} ]; then
-                                                        mkdir ${target}/version1/${p}
-                                                    fi
-                                                    cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
-                                                    echo "-> Backup of ${p}/${l} completeted."
-                                                    echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                    echo
-                                                ;;
-                                                *)
-                                                    echo "-> Starting full backup of ${p}/${l}..."
-                                                    echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                    if [ ! -d ${target}/version1/${p} ]; then
-                                                        mkdir ${target}/version1/${p}
-                                                    fi
-                                                    cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                    echo "-> Full backup of ${p}/${l} completeted."
-                                                    echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                    echo
-                                                ;;                                    
-                                            esac
+                                            if [ -f /config/current.mode ]; then
+                                                read modeCURRENT < /config/current.mode
+                                                case $modeCURRENT in
+                                                    full)
+                                                        echo "-> Starting full backup of ${p}/${l}..."
+                                                        echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                        echo "-> Backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;
+                                                    channel)
+                                                        echo "-> Starting channel backup of ${p}/${l}..."
+                                                        echo "$(date) --> Backup of channel ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        if [ ! -d ${target}/version1/${p}/${l} ]; then
+                                                            mkdir ${target}/version1/${p}/${l}
+                                                        fi
+                                                        cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                        echo "-> Backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;
+                                                    *)
+                                                        echo "-> Starting DEFAULT backup of ${p}/${l}..."
+                                                        echo "$(date) --> DEFAULT backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                        if [ ! -d ${target}/version1/${p} ]; then
+                                                            mkdir ${target}/version1/${p}
+                                                        fi
+                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                        echo "-> DEFAULT backup of ${p}/${l} completeted."
+                                                        echo "$(date) --> DEFAULT backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                        echo
+                                                    ;;                                    
+                                                esac
+                                            else
+                                                echo "-> Error 104 - No current.mode found."
+                                                echo "$(date) --> Error 104 - No current.mode found." >> $logpath/juggler.log
+                                            fi
                                         fi
                                 done
                             fi
@@ -209,41 +227,50 @@ else
                                                 echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
                                                 echo
                                             else
-                                                case $3 in
-                                                    full)
-                                                        echo "-> Starting full backup of ${p}/${l}..."
-                                                        echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                        if [ ! -d ${target}/version1/${p} ]; then
-                                                            mkdir ${target}/version1/${p}
-                                                        fi
-                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                        echo "-> Backup of ${p}/${l} completeted."
-                                                        echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
-                                                        echo
-                                                    ;;
-                                                    channel)
-                                                        echo "-> Starting channel backup of ${p}/${l}..."
-                                                        echo "$(date) --> Backup channel of ${p}/${l} started." >> $logpath/juggler.log
-                                                        if [ ! -d ${target}/version1/${p} ]; then
-                                                            mkdir ${target}/version1/${p}
-                                                        fi
-                                                        cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
-                                                        echo "-> Backup of ${p}/${l} completeted."
-                                                        echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                        echo
-                                                    ;;
-                                                    *)
-                                                        echo "-> Starting full backup of ${p}/${l}..."
-                                                        echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
-                                                        if [ ! -d ${target}/version1/${p} ]; then
-                                                            mkdir ${target}/version1/${p}
-                                                        fi
-                                                        cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                        echo "-> Full backup of ${p}/${l} completeted."
-                                                        echo "$(date) --> Full backup of ${p}/${l} completeted." >> $logpath/juggler.log
-                                                        echo
-                                                    ;;                                    
-                                                esac
+                                                if [ -f /config/current.mode ]; then
+                                                    read modeCURRENT < /config/current.mode
+                                                    case $modeCURRENT in
+                                                        full)
+                                                            echo "-> Starting full backup of ${p}/${l}..."
+                                                            echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                                mkdir ${target}/version1/${p}
+                                                            fi
+                                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                            echo "-> Backup of ${p}/${l} completeted."
+                                                            echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                                            echo
+                                                        ;;
+                                                        channel)
+                                                            echo "-> Starting channel backup of ${p}/${l}..."
+                                                            echo "$(date) --> Backup channel of ${p}/${l} started." >> $logpath/juggler.log
+                                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                                mkdir ${target}/version1/${p}
+                                                            fi
+                                                            if [ ! -d ${target}/version1/${p}/${l} ]; then
+                                                                mkdir ${target}/version1/${p}/${l}
+                                                            fi
+                                                            cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                            echo "-> Backup of ${p}/${l} completeted."
+                                                            echo "$(date) --> Backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                            echo
+                                                        ;;
+                                                        *)
+                                                            echo "-> Starting DEFAULT backup of ${p}/${l}..."
+                                                            echo "$(date) --> DEFAULT backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                            if [ ! -d ${target}/version1/${p} ]; then
+                                                                mkdir ${target}/version1/${p}
+                                                            fi
+                                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                            echo "-> DEFAULT backup of ${p}/${l} completeted."
+                                                            echo "$(date) --> DEFAULT backup of ${p}/${l} completeted." >> $logpath/juggler.log
+                                                            echo
+                                                        ;;                                    
+                                                    esac
+                                                else
+                                                    echo "-> Error 104 - No current.mode found."
+                                                    echo "$(date) --> Error 104 - No current.mode found." >> $logpath/juggler.log
+                                                fi
                                             fi
                                     done
                                 fi
@@ -286,41 +313,51 @@ else
                                     echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up yet?" >> $logpath/juggler.log
                                     echo
                                 else
-                                    case $3 in
-                                        full)
-                                            echo "-> Starting full backup of ${p}/${l}..."
-                                            echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
-                                            if [ ! -d ${target}/version1/${p} ]; then
-                                                mkdir ${target}/version1/${p}
-                                            fi
-                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                            echo "-> Backup of ${p}/${p}/${l} completeted."
-                                            echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
-                                            echo
-                                        ;;
-                                        channel)
-                                            echo "-> Starting channel backup of ${p}/${l}..."
-                                            echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
-                                            if [ ! -d ${target}/version1/${p} ]; then
-                                                mkdir ${target}/version1/${p}
-                                            fi
-                                            cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
-                                            echo "-> Backup of ${p}/${p}/${l} completeted."
-                                            echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
-                                            echo
-                                        ;;
-                                        *)
-                                            echo "-> Starting full backup of ${p}/${l}..."
-                                            echo "$(date) --> Full backup of ${p}/${l} started." >> $logpath/juggler.log
-                                            if [ ! -d ${target}/version1/${p} ]; then
-                                                mkdir ${target}/version1/${p}
-                                            fi
-                                            cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                            echo "-> Full backup of ${p}/${p}/${l} completeted."
-                                            echo "$(date) --> Full backup of ${p} completeted." >> $logpath/juggler.log
-                                            echo
-                                        ;;                                    
-                                    esac
+                                    if [ -f /config/current.mode ]; then
+                                        read modeCURRENT < /config/current.mode
+                                        case $modeCURRENT in
+                                            full) 
+                                                echo "-> Starting full backup of ${p}/${l}..."
+                                                echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                echo "-> Backup of ${p}/${p}/${l} completeted."
+                                                echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;
+                                            channel)
+                                                echo "-> Starting channel backup of ${p}/${l}..."
+                                                echo "$(date) --> Backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                if [ ! -d ${target}/version1/${p}/${l} ]; then
+                                                    mkdir ${target}/version1/${p}/${l}
+                                                fi
+                                                cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
+                                                echo "-> Backup of ${p}/${p}/${l} completeted."
+                                                echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;
+                                            *)  
+                                                echo "${modeCURRENT}"
+                                                echo "-> Starting DEFAULT backup of ${p}/${l}..."
+                                                echo "$(date) --> DEFAULT backup of ${p}/${l} started." >> $logpath/juggler.log
+                                                if [ ! -d ${target}/version1/${p} ]; then
+                                                    mkdir ${target}/version1/${p}
+                                                fi
+                                                cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
+                                                echo "-> DEFAULT backup of ${p}/${p}/${l} completeted."
+                                                echo "$(date) --> DEFAULT backup of ${p} completeted." >> $logpath/juggler.log
+                                                echo
+                                            ;;                                    
+                                        esac
+                                    else
+                                        echo "-> Error 104 - No current.mode found."
+                                        echo "$(date) --> Error 104 - No current.mode found." >> $logpath/juggler.log
+                                    fi
                                 fi
                         done
                     fi

@@ -5,6 +5,51 @@ logpath=/config/logs
 if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; then
     touch $logpath/juggler.log
     echo "$(date) -> BKP Service is ENABLED - Job Started" >> $logpath/juggler.log
+    if [ -f /config/now.mode ]; then
+        read modeNOW < /config/now.mode
+        case $modeNOW in
+            0)
+                if [ -f /config/bkp.mode ]; then
+                    read modeCURRENT < /config/bkp.mode
+                    touch /config/current.mode
+                    echo ${modeCURRENT} > /config/current.mode
+                else
+                    echo "$(date) -> No bkp.mode found set default mode to FULL" >> $logpath/juggler.log
+                    touch /config/bkp.mode
+                    echo "full" > /config/bkp.mode
+                    touch /config/current.mode
+                    echo "full" > /config/current.mode
+                fi
+            ;;
+            1)
+                if [ -f /config/current.mode ]; then
+                    read modeCURRENT < /config/current.mode
+                    echo "current.mode found: ${modeCURRENT}"
+                    echo "0" > /config/now.mode
+                else
+                    echo "No current.mode found set default mode to FULL" >> $logpath/juggler.log
+                    touch /config/current.mode
+                    echo "full" > /config/current.mode
+                fi
+            ;;
+            *)
+                echo "Error - No valid now.mode setting found. Please run ee bkp now for initialiation."
+            ;;
+        esac            
+    else
+        echo "Error - No now.mode setting found. Using bkp.mode instead."
+        if [ -f /config/bkp.mode ]; then
+            read modeCURRENT < /config/bkp.mode
+            touch /config/current.mode
+            echo ${modeCURRENT} > /config/current.mode
+        else
+            echo "No bkp.mode found set default mode to FULL" >> $logpath/juggler.log
+            touch /config/bkp.mode
+            echo "full" > /config/bkp.mode
+            touch /config/current.mode
+            echo "full" > /config/current.mode
+         fi
+    fi
     chown -R app:app /config
     cd /app/easyepg || exit
     export TERM=xterm
@@ -17,7 +62,7 @@ else
         echo "$(date) -> BKP Service is DISABELD" >> $logpath/juggler.log 
     else
         touch $logpath/juggler.log
-         echo "$(date) -> Error - No BKP Status Setting for BKP found. Please restart container." >> $logpath/juggler.log
+         echo "$(date) -> Error - No BKP status setting for BKP found. Please restart container." >> $logpath/juggler.log
     fi
 fi
 
