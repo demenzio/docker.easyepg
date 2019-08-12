@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#. /app/data/scripts/load
+#source /app/data/scripts/load
+
 case $1 in
     version|ver|v)
         if [ -f /app/defaults/ver ]; then
@@ -145,20 +148,32 @@ case $1 in
                 case $3 in
                     1)
                         echo
-                        echo "Load BackUp 1 from {DATE}? y/n"
-                        echo "PLACEHODLER"
+                        read -p "Do you wish to load backup version 1 right now? (Y/N) " yn
+                        case $yn in
+                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "1";;
+                            [Nn]* ) echo && exit;;
+                            * ) echo "-> Please answer yes or no.";;
+                        esac
                         echo
                     ;;
                     2)
                         echo
-                        echo "Load BackUp 2 from {DATE}? y/n"
-                        echo "PLACEHODLER"
+                        read -p "Do you wish to load backup version 1 right now? (Y/N) " yn
+                        case $yn in
+                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "2";;
+                            [Nn]* ) echo && exit;;
+                            * ) echo "-> Please answer yes or no.";;
+                        esac
                         echo
                     ;;
                     3)
                         echo
-                        echo "Load BackUp 3 from {DATE}? y/n"
-                        echo "PLACEHODLER"
+                        read -p "Do you wish to load backup version 1 right now? (Y/N) " yn
+                        case $yn in
+                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "3";;
+                            [Nn]* ) echo && exit;;
+                            * ) echo "-> Please answer yes or no.";;
+                        esac
                         echo
                     ;;
                     *)

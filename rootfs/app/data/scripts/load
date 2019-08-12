@@ -1,0 +1,146 @@
+#!/bin/bash
+
+load(){
+   if [ "$(ls -A $target)" ]; then #notEmpty
+      case $1 in
+         1)
+            if [ -d ${target}/version1 ]; then
+               echo "-> Backup VERSION 1 found. Loading backup..."
+               echo "$(date) --> Backup VERSION 1 found. Loading backup..." >> $logpath/juggler.log               
+               echo 
+               echo "Looking for providerlist..."
+               if [ ! -f /app/defaults/providers/all ]; then
+                  echo "-> ...not found."
+                  echo "-> Please recreate Container from image."
+                  echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
+               else
+                  readarray -t providers < /app/defaults/providers/all
+                  for p in "${providers[@]}"
+                     do  
+                        if [ -d ${target}/version1/$p ]; then
+                           readarray -t locations < /app/defaults/providers/$p
+                           for l in "${locations[@]}"
+                              do
+                                 if [ ! -d ${target}/version1/$p/$l ]; then
+                                    echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
+                                    echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
+                                    echo
+                                 else
+                                    #IF JUST CHANNELS JSON THEN
+                                    echo "-> Copying VERSION 1 - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 1 - ${p}/${l}" >> $logpath/juggler.log   
+                                    rm -rf /app/easyepg/${p}/${l}
+                                    cp ${target}/version1/${p}/${l} /app/easyepg/${p}/${l}
+                                    echo "-> Done VERSION 1 - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 1 - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo 
+
+                                 fi
+                           done      
+                        else
+                           echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                           echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                           echo
+                        fi
+                  done           
+               fi
+            fi                                
+         ;;
+         2)
+            if [ -d ${target}/version2 ]; then
+               echo "-> Backup VERSION 2 found. Loading backup..."
+               echo "$(date) --> Backup VERSION 2 found. Loading backup..." >> $logpath/juggler.log               
+               echo 
+               echo "Looking for providerlist..."
+               if [ ! -f /app/defaults/providers/all ]; then
+                  echo "-> ...not found."
+                  echo "-> Please recreate Container from image."
+                  echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
+               else
+                  readarray -t providers < /app/defaults/providers/all
+                  for p in "${providers[@]}"
+                     do  
+                        if [ -d ${target}/version2/$p ]; then
+                           readarray -t locations < /app/defaults/providers/$p
+                           for l in "${locations[@]}"
+                              do
+                                 if [ ! -d ${target}/version2/$p/$l ]; then
+                                    echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
+                                    echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
+                                    echo
+                                 else
+                                    #IF JUST CHANNELS JSON THEN
+                                    echo "-> Copying VERSION 2 - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 2 - ${p}/${l}" >> $logpath/juggler.log   
+                                    rm -rf /app/easyepg/${p}/${l}
+                                    cp ${target}/version2/${p}/${l} /app/easyepg/${p}/${l}
+                                    echo "-> Done VERSION 2 - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 2 - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo 
+
+                                 fi
+                           done      
+                        else
+                           echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                           echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                           echo
+                        fi
+                  done           
+               fi
+            fi
+         ;;
+         3)
+            if [ -d ${target}/version3 ]; then
+               echo "-> Backup VERSION 3 found. Loading backup..."
+               echo "$(date) --> Backup VERSION 3 found. Loading backup..." >> $logpath/juggler.log               
+               echo 
+               echo "Looking for providerlist..."
+               if [ ! -f /app/defaults/providers/all ]; then
+                  echo "-> ...not found."
+                  echo "-> Please recreate Container from image."
+                  echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
+               else
+                  readarray -t providers < /app/defaults/providers/all
+                  for p in "${providers[@]}"
+                     do  
+                        if [ -d ${target}/version3/$p ]; then
+                           readarray -t locations < /app/defaults/providers/$p
+                           for l in "${locations[@]}"
+                              do
+                                 if [ ! -d ${target}/version3/$p/$l ]; then
+                                    echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
+                                    echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
+                                    echo
+                                 else
+                                    #IF JUST CHANNELS JSON THEN
+                                    echo "-> Copying VERSION 3 - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 3 - ${p}/${l}" >> $logpath/juggler.log   
+                                    rm -rf /app/easyepg/${p}/${l}
+                                    cp ${target}/version3/${p}/${l} /app/easyepg/${p}/${l}
+                                    echo "-> Done VERSION 3 - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 3 - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo 
+
+                                 fi
+                           done      
+                        else
+                           echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
+                           echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
+                           echo
+                        fi
+                  done           
+               fi
+            fi
+         ;;
+         *)
+            echo "-> Error 103 - Please choose a valid option."
+            echo "$(date) --> Error 103 - Please choose a valid option." >> $logpath/juggler.log
+            echo
+         ;;
+      esac
+   else #empty
+      echo "-> Error - No backup location found. Run ee bkp reload or ee bkp reset."
+      echo "$(date) --> No backup location found. Run ee bkp reload or ee bkp reset." >> $logpath/juggler.log
+      echo
+   fi
+}
