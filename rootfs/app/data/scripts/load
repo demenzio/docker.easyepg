@@ -1,6 +1,8 @@
 #!/bin/bash
 
-load(){
+target=/config/backup
+
+
    if [ "$(ls -A $target)" ]; then #notEmpty
       case $1 in
          1)
@@ -143,4 +145,3 @@ load(){
       echo "$(date) --> No backup location found. Run ee bkp reload or ee bkp reset." >> $logpath/juggler.log
       echo
    fi
-}
