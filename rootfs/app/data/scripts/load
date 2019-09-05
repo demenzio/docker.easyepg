@@ -1,6 +1,8 @@
 #!/bin/bash
 
 target=/config/backup
+logpath=/config/logs
+touch $logpath/juggler.log
 
 if [ "$(ls -A $target)" ]; then #notEmpty
    case $1 in
@@ -26,15 +28,33 @@ if [ "$(ls -A $target)" ]; then #notEmpty
                                  echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
                                  echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
                                  echo
-                              else
-                                 #IF JUST CHANNELS JSON THEN
-                                 echo "-> Copying VERSION 1 - ${p}/${l}"
-                                 echo "$(date) --> Copying VERSION 1 - ${p}/${l}" >> $logpath/juggler.log   
-                                 rm -rf /app/easyepg/${p}/${l}
-                                 cp ${target}/version1/${p}/${l} /app/easyepg/${p}/${l}
-                                 echo "-> Done VERSION 1 - ${p}/${l}"
-                                 echo "$(date) --> Done VERSION 1 - ${p}/${l}" >> $logpath/juggler.log               
-                                 echo 
+                              else  
+                                 filecount=$(ls ${target}/version1/$p/$l | wc -l)
+                                 if [ "$filecount" == "1" ]; then
+                                    #i channel mode
+                                    readarray -t filenames < <(find ${target}/version1/$p/$l/*.* -printf "%f\n")
+                                    echo "-> Copying VERSION 1 [CHANNEL] - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 1 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
+                                    for f in "${filenames[@]}"
+                                       do
+                                          rm /app/easyepg/${p}/${l}/${f}
+                                          cp ${target}/version1/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
+                                          echo "--> Restore of ${p}/${l}/${f} - Completed"
+                                          echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
+                                       done
+                                    echo "-> Done VERSION 1 [CHANNEL] - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 1 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo
+                                 else
+                                    #i full mode
+                                    echo "-> Copying VERSION 1 [FULL] - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 1 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
+                                    rm -rf /app/easyepg/${p}/${l}
+                                    cp -r ${target}/version1/${p}/${l} /app/easyepg/${p}/${l}
+                                    echo "-> Done VERSION 1 [FULL] - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 1 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo
+                                 fi
                               fi
                         done      
                      else
@@ -69,15 +89,33 @@ if [ "$(ls -A $target)" ]; then #notEmpty
                                  echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
                                  echo
                               else
-                                 #IF JUST CHANNELS JSON THEN
-                                 echo "-> Copying VERSION 2 - ${p}/${l}"
-                                 echo "$(date) --> Copying VERSION 2 - ${p}/${l}" >> $logpath/juggler.log   
-                                 rm -rf /app/easyepg/${p}/${l}
-                                 cp ${target}/version2/${p}/${l} /app/easyepg/${p}/${l}
-                                 echo "-> Done VERSION 2 - ${p}/${l}"
-                                 echo "$(date) --> Done VERSION 2 - ${p}/${l}" >> $logpath/juggler.log               
-                                 echo 
-                                 fi
+                                 filecount=$(ls ${target}/version2/$p/$l | wc -l)
+                                 if [ "$filecount" == "1" ]; then
+                                    #i channel mode
+                                    readarray -t filenames < <(find ${target}/version2/$p/$l/*.* -printf "%f\n")
+                                    echo "-> Copying VERSION 2 [CHANNEL] - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 2 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
+                                    for f in "${filenames[@]}"
+                                       do
+                                          rm /app/easyepg/${p}/${l}/${f}
+                                          cp ${target}/version2/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
+                                          echo "--> Restore of ${p}/${l}/${f} - Completed"
+                                          echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
+                                       done
+                                    echo "-> Done VERSION 2 [CHANNEL] - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 2 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo
+                                 else
+                                    #i full mode
+                                    echo "-> Copying VERSION 2 [FULL] - ${p}/${l}"
+                                    echo "$(date) --> Copying VERSION 2 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
+                                    rm -rf /app/easyepg/${p}/${l}
+                                    cp -r ${target}/version2/${p}/${l} /app/easyepg/${p}/${l}
+                                    echo "-> Done VERSION 2 [FULL] - ${p}/${l}"
+                                    echo "$(date) --> Done VERSION 2 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
+                                    echo
+                                 fi 
+                              fi
                         done      
                      else
                         echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
@@ -111,16 +149,34 @@ if [ "$(ls -A $target)" ]; then #notEmpty
                               echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
                               echo
                            else
-                              #IF JUST CHANNELS JSON THEN
-                              echo "-> Copying VERSION 3 - ${p}/${l}"
-                              echo "$(date) --> Copying VERSION 3 - ${p}/${l}" >> $logpath/juggler.log   
-                              rm -rf /app/easyepg/${p}/${l}
-                              cp ${target}/version3/${p}/${l} /app/easyepg/${p}/${l}
-                              echo "-> Done VERSION 3 - ${p}/${l}"
-                              echo "$(date) --> Done VERSION 3 - ${p}/${l}" >> $logpath/juggler.log               
-                              echo
+                              filecount=$(ls ${target}/version3/$p/$l | wc -l)
+                              if [ "$filecount" == "1" ]; then
+                                 #i channel mode
+                                 readarray -t filenames < <(find ${target}/version3/$p/$l/*.* -printf "%f\n")
+                                 echo "-> Copying VERSION 3 [CHANNEL] - ${p}/${l}"
+                                 echo "$(date) --> Copying VERSION 3 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
+                                 for f in "${filenames[@]}"
+                                    do
+                                       rm /app/easyepg/${p}/${l}/${f}
+                                       cp ${target}/version3/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
+                                       echo "--> Restore of ${p}/${l}/${f} - Completed"
+                                       echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
+                                    done
+                                 echo "-> Done VERSION 3 [CHANNEL] - ${p}/${l}"
+                                 echo "$(date) --> Done VERSION 3 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
+                                 echo
+                              else
+                                 #i full mode
+                                 echo "-> Copying VERSION 3 [FULL] - ${p}/${l}"
+                                 echo "$(date) --> Copying VERSION 3 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
+                                 rm -rf /app/easyepg/${p}/${l}
+                                 cp -r ${target}/version3/${p}/${l} /app/easyepg/${p}/${l}
+                                 echo "-> Done VERSION 3 [FULL] - ${p}/${l}"
+                                 echo "$(date) --> Done VERSION 3 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
+                                 echo
                               fi
-                           done      
+                           fi
+                        done      
                      else
                         echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
                         echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
@@ -139,6 +195,6 @@ if [ "$(ls -A $target)" ]; then #notEmpty
 else #empty
    echo
    echo "-> Error - No backup location found. Run ee bkp reload or ee bkp reset."
-   echo "$(date) --> No backup location found. Run ee bkp reload or ee bkp reset." >> $logpath/juggler.log
+   echo "$(date) --> No backup location found. Run ee bkp reload or ee bkp reset." >> $logpath/juggler.log #/app/data/scripts/load: line 145: /juggler.log: Permission denied
    echo
 fi

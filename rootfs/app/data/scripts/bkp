@@ -323,7 +323,7 @@ else
                                                     mkdir ${target}/version1/${p}
                                                 fi
                                                 cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                echo "-> Backup of ${p}/${p}/${l} completeted."
+                                                echo "-> Backup of ${p}/${l} completeted."
                                                 echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
                                                 echo
                                             ;;
@@ -337,7 +337,7 @@ else
                                                     mkdir ${target}/version1/${p}/${l}
                                                 fi
                                                 cp /app/easyepg/${p}/${l}/channels.json ${target}/version1/${p}/${l}/channels.json
-                                                echo "-> Backup of ${p}/${p}/${l} completeted."
+                                                echo "-> Backup of ${p}/${l} completeted."
                                                 echo "$(date) --> Backup of ${p} completeted." >> $logpath/juggler.log
                                                 echo
                                             ;;
@@ -349,7 +349,7 @@ else
                                                     mkdir ${target}/version1/${p}
                                                 fi
                                                 cp -r /app/easyepg/${p}/${l} ${target}/version1/${p}/${l}
-                                                echo "-> DEFAULT backup of ${p}/${p}/${l} completeted."
+                                                echo "-> DEFAULT backup of ${p}/${l} completeted."
                                                 echo "$(date) --> DEFAULT backup of ${p} completeted." >> $logpath/juggler.log
                                                 echo
                                             ;;                                    
