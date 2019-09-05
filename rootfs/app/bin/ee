@@ -20,6 +20,112 @@ case $1 in
     setup|conf|gepg)
         /app/bin/cron-juggler-epg
     ;;
+    cron)
+        case $2 in
+            ls|show)
+            echo
+            echo "-> Cron supported services are:"
+                if [ -f /config/status/epg/enabled ] && [ ! -f /config/status/epg/disabled ]; then
+                    echo "--> EPG - currently ENABLED"
+                else
+                    if [ ! -f /config/status/epg/enabled ] && [ -f /config/status/epg/disabled ]; then
+                        echo "-> EPG - currently DISABLED" 
+                    else
+                        echo "-> EPG - No Valid Status Found. Please Restart Container."
+                    fi
+                fi
+                if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; then
+                    echo "--> BKP - currently ENABLED"
+                else
+                    if [ ! -f /config/status/bkp/enabled ] && [ -f /config/status/bkp/disabled ]; then
+                        echo "-> BKP - currently DISABLED" 
+                    else
+                        echo "-> BKP - No Valid Status Found. Please Restart Container."
+                    fi
+                fi                
+                echo
+                echo "-> Current Settings are:"
+                if [ -f /config/epg_refresh-cron ]; then
+                    echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                else
+                    echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use \'cron set epg\' to set your own."
+                fi
+                if [ -f /config/bkp_run-cron ]; then
+                    currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
+                    echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                else
+                    echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use \'cron set bkp\' to set your own."
+                fi
+                echo
+            ;;
+            set)
+                case $3 in
+                    epg)
+                        touch /config/epg_refresh-cron
+                        if [ ! -z "$4" ] && [ ! -z "$5" ] && [ ! -z "$6" ] && [ ! -z "$7" ] && [ ! -z "$8" ]; then
+                            printf "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-epg" > /config/epg_refresh-cron
+                            chown app:app /config/epg_refresh-cron
+                            echo
+                            echo "-> New Settings are:"
+                            if [ -f /config/epg_refresh-cron ]; then
+                                echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                            else
+                                echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
+                            fi
+                            if [ -f /config/bkp_run-cron ]; then
+                                currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
+                                echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                            else
+                                echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
+                            fi
+                            echo
+                        else
+                            echo
+                            echo "-> Error - Please set all five parameters. (e.g. ee cron set epg 2 3 \* \* \*)"
+                            echo
+                        fi
+                    ;;
+                    bkp)
+                        touch /config/bkp_run-cron
+                        if [ ! -z "$4" ] && [ ! -z "$5" ] && [ ! -z "$6" ] && [ ! -z "$7" ] && [ ! -z "$8" ]; then
+                            printf "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-bkp" > /config/bkp_run-cron
+                            chown app:app /config/bkp_run-cron
+                            echo
+                            echo "-> New Settings are:"
+                            if [ -f /config/epg_refresh-cron ]; then
+                                echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                            else
+                                echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
+                            fi
+                            if [ -f /config/bkp_run-cron ]; then
+                                currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
+                                echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                            else
+                                echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
+                            fi
+                            echo
+                        else
+                            echo
+                            echo "-> Error - Please set all five parameters. (e.g. ee cron set bkp 2 3 \* \* \*)"
+                            echo
+                        fi
+                    ;;
+                    *)
+                        echo
+                        echo "Please choose a valid option."
+                        cat /app/data/man/cron | sed 's/\t/,|,/g' | column -s ',' -t
+                        echo
+                    ;;
+                esac
+            ;;
+            *)
+                echo
+                echo "Please choose a valid option."
+                cat /app/data/man/cron | sed 's/\t/,|,/g' | column -s ',' -t
+                echo
+            ;;
+        esac
+    ;;
     xml)
         if [ `ls -A /data | wc -l` -eq 0 ]; then
             echo

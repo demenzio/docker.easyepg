@@ -1,0 +1,4 @@
+CMD,OPTION,DESCRIPTION
+=============,================,=============================
+cron,ls,Show current cron job settings
+ ,set epg/bkp,Change choosen cron setting

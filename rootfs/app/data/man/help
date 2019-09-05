@@ -9,6 +9,8 @@ backup|bkp,status,Current service status
  ,now full/channel,Do back up right now
  ,reset,Reinitialize folder structure
  ,restore,Undo reset
+cron,ls,Show current cron job settings
+ ,set epg/bkp,Change choosen cron setting
 service,status,Current service status
  ,1,Enable service
  ,0,Disable service
