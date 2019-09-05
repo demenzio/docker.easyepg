@@ -105,6 +105,15 @@ else
         touch /config/status/bkp/enabled
     fi
 fi
+echo "Checking cron directory:"
+if [ ! -d /config/cron ]; then
+    echo "-> ...not found."
+    echo "->Creating cron dir."
+    mkdir -p /config/cron
+else
+    echo "-> ...found."
+fi
+echo
 echo 
 echo "Setting owner, current settings are:"
 chown -R app:app /config

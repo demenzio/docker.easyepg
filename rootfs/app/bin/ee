@@ -45,36 +45,42 @@ case $1 in
                 fi                
                 echo
                 echo "-> Current Settings are:"
-                if [ -f /config/epg_refresh-cron ]; then
-                    echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                if [ -f /config/cron/epg_refresh-cron ]; then
+                    echo "--> EPG - $(cat /config/cron/epg_refresh-cron | cut -f1-5 -d" ")"
                 else
-                    echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use \'cron set epg\' to set your own."
+                    echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
                 fi
-                if [ -f /config/bkp_run-cron ]; then
-                    currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
-                    echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                if [ -f /config/cron/bkp_run-cron ]; then
+                    echo "--> BKP - $(cat /config/cron/bkp_run-cron | cut -f1-5 -d" ")"
                 else
-                    echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use \'cron set bkp\' to set your own."
+                    echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
                 fi
                 echo
             ;;
             set)
                 case $3 in
                     epg)
-                        touch /config/epg_refresh-cron
+                        touch /config/cron/epg_refresh-cron
                         if [ ! -z "$4" ] && [ ! -z "$5" ] && [ ! -z "$6" ] && [ ! -z "$7" ] && [ ! -z "$8" ]; then
-                            printf "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-epg" > /config/epg_refresh-cron
-                            chown app:app /config/epg_refresh-cron
+                            echo "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-epg" > /config/cron/epg_refresh-cron
+                            chown app:app /config/cron/epg_refresh-cron
+                            if [ -f /config/cron/epg_refresh-cron ] && [ -f /config/cron/bkp_run-cron ]; then
+                                cp /config/cron/epg_refresh-cron /config/cron/cronlist
+                                cat /config/cron/bkp_run-cron >> /config/cron/cronlist
+                                chown app:app /config/cron/cronlist
+                                crontab /config/cron/cronlist
+                            else
+                                echo "No costom cron jobs found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
+                            fi
                             echo
                             echo "-> New Settings are:"
-                            if [ -f /config/epg_refresh-cron ]; then
-                                echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                            if [ -f /config/cron/epg_refresh-cron ]; then
+                                echo "--> EPG - $(cat /config/cron/epg_refresh-cron | cut -f1-5 -d" ")"
                             else
                                 echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
                             fi
-                            if [ -f /config/bkp_run-cron ]; then
-                                currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
-                                echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                            if [ -f /config/cron/bkp_run-cron ]; then
+                                echo "--> BKP - $(cat /config/cron/bkp_run-cron | cut -f1-5 -d" ")"
                             else
                                 echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
                             fi
@@ -86,20 +92,27 @@ case $1 in
                         fi
                     ;;
                     bkp)
-                        touch /config/bkp_run-cron
+                        touch /config/cron/bkp_run-cron
                         if [ ! -z "$4" ] && [ ! -z "$5" ] && [ ! -z "$6" ] && [ ! -z "$7" ] && [ ! -z "$8" ]; then
-                            printf "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-bkp" > /config/bkp_run-cron
-                            chown app:app /config/bkp_run-cron
+                            echo "${4} ${5} ${6} ${7} ${8} /bin/bash /app/bin/cron-juggler-bkp" > /config/cron/bkp_run-cron
+                            chown app:app /config/cron/bkp_run-cron
+                            if [ -f /config/cron/epg_refresh-cron ] && [ -f /config/cron/bkp_run-cron ]; then
+                                cp /config/cron/epg_refresh-cron /config/cron/cronlist
+                                cat /config/cron/bkp_run-cron >> /config/cron/cronlist
+                                chown app:app /config/cron/cronlist
+                                crontab /config/cron/cronlist
+                            else
+                                echo "No costom cron jobs found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
+                            fi
                             echo
                             echo "-> New Settings are:"
-                            if [ -f /config/epg_refresh-cron ]; then
-                                echo "--> EPG - $(cat /config/epg_refresh-cron | cut -f1-5 -d" ")"
+                            if [ -f /config/cron/epg_refresh-cron ]; then
+                                echo "--> EPG - $(cat /config/cron/epg_refresh-cron | cut -f1-5 -d" ")"
                             else
                                 echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
                             fi
-                            if [ -f /config/bkp_run-cron ]; then
-                                currentEPG=$(cat bkp_run-cron | cut -f1-5 -d" ")
-                                echo "--> BKP - $(cat /config/bkp_run-cron | cut -f1-5 -d" ")"
+                            if [ -f /config/cron/bkp_run-cron ]; then
+                                echo "--> BKP - $(cat /config/cron/bkp_run-cron | cut -f1-5 -d" ")"
                             else
                                 echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
                             fi

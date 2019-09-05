@@ -2,30 +2,51 @@
 
 echo
 echo "Looking for epg cron job..."
-if [ ! -e /config/epg_refresh-cron ]; then
+if [ ! -e /config/cron/epg_refresh-cron ]; then
     echo "-> ..not found."
     echo "Loading default setting..."
-    cp /app/defaults/epg_refresh-cron /config/epg_refresh-cron
-    chown app:app /config/epg_refresh-cron
+    cp /app/defaults/epg_refresh-cron /config/cron/epg_refresh-cron
+    chown app:app /config/cron/epg_refresh-cron
 else
     echo "-> ...found."
 fi
 echo "Done"
 echo 
-crontab /config/epg_refresh-cron
 echo "Looking for bkp cron job..."
-if [ ! -e /config/bkp_run-cron ]; then
+if [ ! -e /config/cron/bkp_run-cron ]; then
     echo "-> ..not found."
     echo "Loading default setting..."
-    cp /app/defaults/bkp_run-cron /config/bkp_run-cron
-    chown app:app /config/bkp_run-cron
+    cp /app/defaults/bkp_run-cron /config/cron/bkp_run-cron
+    chown app:app /config/cron/bkp_run-cron
 else
     echo "-> ...found."
 fi
 echo "Done"
 echo 
-crontab /config/bkp_run-cron
-echo 
+echo "Loading jobs into crontab"
+#//touch /config/cron/cronlist
+#//echo $(head -n 1 /config/cron/epg_refresh-cron) > /config/cron/cronlist
+#//echo $(head -n 1 /config/cron/bkp_run-cron) >> /config/cron/cronlist
+if [ -f /config/cron/epg_refresh-cron ] && [ -f /config/cron/bkp_run-cron ]; then
+    cp /config/cron/epg_refresh-cron /config/cron/cronlist
+    cat /config/cron/bkp_run-cron >> /config/cron/cronlist
+    crontab /config/cron/cronlist
+else
+    echo "No costom cron jobs found. Please restart container."
+fi
+echo "-> Current jobs are:"
+if [ -f /config/cron/epg_refresh-cron ]; then
+    echo "--> EPG - $(cat /config/cron/epg_refresh-cron | cut -f1-5 -d" ")"
+else
+    echo "--> EPG - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set epg' to set your own."
+fi
+if [ -f /config/cron/bkp_run-cron ]; then
+    echo "--> BKP - $(cat /config/cron/bkp_run-cron | cut -f1-5 -d" ")"
+else
+    echo "--> BKP - Error - No Setting Found. Please Restart Containter to Load Default or use 'cron set bkp' to set your own."
+fi
+echo "Done"
+echo
 echo "Setting owner, current settings are:"
 chown -R app:app /config
 chown -R app:app /data
