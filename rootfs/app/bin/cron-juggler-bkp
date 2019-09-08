@@ -27,7 +27,7 @@ if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; th
                     echo "current.mode found: ${modeCURRENT}"
                     echo "0" > /config/now.mode
                 else
-                    echo "No current.mode found set default mode to FULL" >> $logpath/juggler.log
+                    echo "$(date) -> No current.mode found set default mode to FULL" >> $logpath/juggler.log
                     touch /config/current.mode
                     echo "full" > /config/current.mode
                 fi
@@ -43,7 +43,7 @@ if [ -f /config/status/bkp/enabled ] && [ ! -f /config/status/bkp/disabled ]; th
             touch /config/current.mode
             echo ${modeCURRENT} > /config/current.mode
         else
-            echo "No bkp.mode found set default mode to FULL" >> $logpath/juggler.log
+            echo "$(date) -> No bkp.mode found set default mode to FULL" >> $logpath/juggler.log
             touch /config/bkp.mode
             echo "full" > /config/bkp.mode
             touch /config/current.mode
