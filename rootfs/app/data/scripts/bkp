@@ -54,7 +54,7 @@ else
             echo "$(date) --> Error - No valid environment found. Please run -> ee bkp reset" >> $logpath/juggler.log
         fi
     else #i NO PRIOR VERSION EXISTS
-        echo "-> No prior VERSION found. Backing up as VERRION1."
+        echo "--> No prior VERSION found. Backing up as VERRION1."
         echo "$(date) ---> No prior VERSION found. Backing up as VERRION1." >> $logpath/juggler.log
         cp $source/easyepg_backup.zip $target/easyepg_backup.ver1
         echo "-> BackUp Cycle - Completed"
