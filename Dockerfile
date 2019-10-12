@@ -27,7 +27,7 @@ RUN echo "**** upgrade system ****" && \
             php-curl \
             git \
             xml-twig-tools \
-            unzip \
+            zip \
             liblocal-lib-perl \
             cpanminus \
             build-essential \
@@ -58,8 +58,7 @@ RUN echo "**** install easyEPG ****" && \
     echo "**** clean up ****" && \
         rm -rf /var/lib/apt/lists/* && \
         apt-get remove -y make \
-            gcc \
-            unzip && \
+            gcc && \
         apt-get autoremove -y && \
         apt-get clean && \
         rm -rf /tmp/*
