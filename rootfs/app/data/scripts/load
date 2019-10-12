@@ -1,190 +1,59 @@
 #!/bin/bash
 
-target=/config/backup
+target=/app/easyepg
+source=/config/backup
 logpath=/config/logs
 touch $logpath/juggler.log
 
-if [ "$(ls -A $target)" ]; then #notEmpty
+if [ "$(ls -A $source)" ]; then #notEmpty
    case $1 in
       1)
-         if [ -d ${target}/version1 ]; then
+         if [ -f ${source}/easyepg_backup.ver1 ]; then
             echo "-> Backup VERSION 1 found. Loading backup..."
             echo "$(date) --> Backup VERSION 1 found. Loading backup..." >> $logpath/juggler.log               
-            echo 
-            echo "Looking for providerlist..."
-            if [ ! -f /app/defaults/providers/all ]; then
-               echo "-> ...not found."
-               echo "-> Please recreate Container from image."
-               echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
-            else
-               readarray -t providers < /app/defaults/providers/all
-               for p in "${providers[@]}"
-                  do  
-                     if [ -d ${target}/version1/$p ]; then
-                        readarray -t locations < /app/defaults/providers/$p
-                        for l in "${locations[@]}"
-                           do
-                              if [ ! -d ${target}/version1/$p/$l ]; then
-                                 echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
-                                 echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
-                                 echo
-                              else  
-                                 filecount=$(ls ${target}/version1/$p/$l | wc -l)
-                                 if [ "$filecount" == "1" ]; then
-                                    #i channel mode
-                                    readarray -t filenames < <(find ${target}/version1/$p/$l/*.* -printf "%f\n")
-                                    echo "-> Copying VERSION 1 [CHANNEL] - ${p}/${l}"
-                                    echo "$(date) --> Copying VERSION 1 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
-                                    for f in "${filenames[@]}"
-                                       do
-                                          rm /app/easyepg/${p}/${l}/${f}
-                                          cp ${target}/version1/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
-                                          echo "--> Restore of ${p}/${l}/${f} - Completed"
-                                          echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
-                                       done
-                                    echo "-> Done VERSION 1 [CHANNEL] - ${p}/${l}"
-                                    echo "$(date) --> Done VERSION 1 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
-                                    echo
-                                 else
-                                    #i full mode
-                                    echo "-> Copying VERSION 1 [FULL] - ${p}/${l}"
-                                    echo "$(date) --> Copying VERSION 1 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
-                                    rm -rf /app/easyepg/${p}/${l}
-                                    cp -r ${target}/version1/${p}/${l} /app/easyepg/${p}/${l}
-                                    echo "-> Done VERSION 1 [FULL] - ${p}/${l}"
-                                    echo "$(date) --> Done VERSION 1 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
-                                    echo
-                                 fi
-                              fi
-                        done      
-                     else
-                        echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
-                        echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
-                        echo
-                     fi
-               done           
-            fi
+            if [ -f ${target}/easyepg_backup.zip ]; then rm -rf ${target}/easyepg_backup.zip; fi
+            cp $source/easyepg_backup.ver1 $target/easyepg_backup.zip
+            echo "-> VERSION 1 copied..."
+            echo "$(date) --> VERSION 1 copied..." >> $logpath/juggler.log 
+            (cd /app/easyepg/ && s6-setuidgid app /bin/bash /app/easyepg/restore.sh)
+            echo "-> VERSION 1 restored..."
+            echo "$(date) --> VERSION 1 restored..." >> $logpath/juggler.log
+            rm -rf $target/easyepg_backup.zip
+         else
+            echo "-> Error - No backup VERSION 1 does exist yet. Run ee bkp now to create a backup."
          fi                                
       ;;
       2)
-         if [ -d ${target}/version2 ]; then
+         if [ -f ${source}/easyepg_backup.ver2 ]; then
             echo "-> Backup VERSION 2 found. Loading backup..."
             echo "$(date) --> Backup VERSION 2 found. Loading backup..." >> $logpath/juggler.log               
-            echo 
-            echo "Looking for providerlist..."
-            if [ ! -f /app/defaults/providers/all ]; then
-               echo "-> ...not found."
-               echo "-> Please recreate Container from image."
-               echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
-            else
-               readarray -t providers < /app/defaults/providers/all
-               for p in "${providers[@]}"
-                  do  
-                     if [ -d ${target}/version2/$p ]; then
-                        readarray -t locations < /app/defaults/providers/$p
-                        for l in "${locations[@]}"
-                           do
-                              if [ ! -d ${target}/version2/$p/$l ]; then
-                                 echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
-                                 echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
-                                 echo
-                              else
-                                 filecount=$(ls ${target}/version2/$p/$l | wc -l)
-                                 if [ "$filecount" == "1" ]; then
-                                    #i channel mode
-                                    readarray -t filenames < <(find ${target}/version2/$p/$l/*.* -printf "%f\n")
-                                    echo "-> Copying VERSION 2 [CHANNEL] - ${p}/${l}"
-                                    echo "$(date) --> Copying VERSION 2 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
-                                    for f in "${filenames[@]}"
-                                       do
-                                          rm /app/easyepg/${p}/${l}/${f}
-                                          cp ${target}/version2/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
-                                          echo "--> Restore of ${p}/${l}/${f} - Completed"
-                                          echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
-                                       done
-                                    echo "-> Done VERSION 2 [CHANNEL] - ${p}/${l}"
-                                    echo "$(date) --> Done VERSION 2 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
-                                    echo
-                                 else
-                                    #i full mode
-                                    echo "-> Copying VERSION 2 [FULL] - ${p}/${l}"
-                                    echo "$(date) --> Copying VERSION 2 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
-                                    rm -rf /app/easyepg/${p}/${l}
-                                    cp -r ${target}/version2/${p}/${l} /app/easyepg/${p}/${l}
-                                    echo "-> Done VERSION 2 [FULL] - ${p}/${l}"
-                                    echo "$(date) --> Done VERSION 2 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
-                                    echo
-                                 fi 
-                              fi
-                        done      
-                     else
-                        echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
-                        echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
-                        echo
-                     fi
-               done           
-            fi
-         fi
+            if [ -f ${target}/easyepg_backup.zip ]; then rm -rf ${target}/easyepg_backup.zip; fi
+            cp $source/easyepg_backup.ver2 $target/easyepg_backup.zip
+            echo "-> VERSION 2 copied..."
+            echo "$(date) --> VERSION 2 copied..." >> $logpath/juggler.log 
+            (cd /app/easyepg/ && s6-setuidgid app /bin/bash /app/easyepg/restore.sh)
+            echo "-> VERSION 2 restored..."
+            echo "$(date) --> VERSION 2 restored..." >> $logpath/juggler.log
+            rm -rf $target/easyepg_backup.zip
+         else
+            echo "-> Error - No backup VERSION 3 does exist yet. Run ee bkp now to create a backup."   
+         fi   
       ;;
       3)
-         if [ -d ${target}/version3 ]; then
+         if [ -f ${source}/easyepg_backup.ver3 ]; then
             echo "-> Backup VERSION 3 found. Loading backup..."
             echo "$(date) --> Backup VERSION 3 found. Loading backup..." >> $logpath/juggler.log               
-            echo 
-            echo "Looking for providerlist..."
-            if [ ! -f /app/defaults/providers/all ]; then
-               echo "-> ...not found."
-               echo "-> Please recreate Container from image."
-               echo "$(date) --> Error - Providerlist not found. Please recreate Container from image." >> $logpath/juggler.log
-            else
-               readarray -t providers < /app/defaults/providers/all
-               for p in "${providers[@]}"
-                  do  
-                     if [ -d ${target}/version3/$p ]; then
-                        readarray -t locations < /app/defaults/providers/$p
-                        for l in "${locations[@]}"
-                        do
-                           if [ ! -d ${target}/version3/$p/$l ]; then
-                              echo "-> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?"
-                              echo "$(date) --> Error - Location ${l} for Provider ${p} has not been found. Maybe it is not set up during before backup?" >> $logpath/juggler.log
-                              echo
-                           else
-                              filecount=$(ls ${target}/version3/$p/$l | wc -l)
-                              if [ "$filecount" == "1" ]; then
-                                 #i channel mode
-                                 readarray -t filenames < <(find ${target}/version3/$p/$l/*.* -printf "%f\n")
-                                 echo "-> Copying VERSION 3 [CHANNEL] - ${p}/${l}"
-                                 echo "$(date) --> Copying VERSION 3 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log
-                                 for f in "${filenames[@]}"
-                                    do
-                                       rm /app/easyepg/${p}/${l}/${f}
-                                       cp ${target}/version3/${p}/${l}/${f} /app/easyepg/${p}/${l}/${f}
-                                       echo "--> Restore of ${p}/${l}/${f} - Completed"
-                                       echo "$(date) ---> Restore of ${p}/${l}/${f} - Completed" >> $logpath/juggler.log  
-                                    done
-                                 echo "-> Done VERSION 3 [CHANNEL] - ${p}/${l}"
-                                 echo "$(date) --> Done VERSION 3 [CHANNEL] - ${p}/${l}" >> $logpath/juggler.log               
-                                 echo
-                              else
-                                 #i full mode
-                                 echo "-> Copying VERSION 3 [FULL] - ${p}/${l}"
-                                 echo "$(date) --> Copying VERSION 3 [FULL] - ${p}/${l}" >> $logpath/juggler.log                                
-                                 rm -rf /app/easyepg/${p}/${l}
-                                 cp -r ${target}/version3/${p}/${l} /app/easyepg/${p}/${l}
-                                 echo "-> Done VERSION 3 [FULL] - ${p}/${l}"
-                                 echo "$(date) --> Done VERSION 3 [FULL] - ${p}/${l}" >> $logpath/juggler.log               
-                                 echo
-                              fi
-                           fi
-                        done      
-                     else
-                        echo "-> Error 102 - ${p} has not been found. Maybe it was removed?"
-                        echo "$(date) --> Error 102 - ${p} has not been found. Maybe it was removed?" >> $logpath/juggler.log
-                        echo
-                     fi
-               done           
-            fi
-         fi
+            if [ -f ${target}/easyepg_backup.zip ]; then rm -rf ${target}/easyepg_backup.zip; fi
+            cp $source/easyepg_backup.ver3 $target/easyepg_backup.zip
+            echo "-> VERSION 3 copied..."
+            echo "$(date) --> VERSION 3 copied..." >> $logpath/juggler.log 
+            (cd /app/easyepg/ && s6-setuidgid app /bin/bash /app/easyepg/restore.sh)
+            echo "-> VERSION 3 restored..."
+            echo "$(date) --> VERSION 3 restored..." >> $logpath/juggler.log
+            rm -rf $target/easyepg_backup.zip
+         else
+            echo "-> Error - No backup VERSION 3 does exist yet. Run ee bkp now to create a backup."   
+         fi   
       ;;
       *)
          echo "-> Error 103 - Please choose a valid option."

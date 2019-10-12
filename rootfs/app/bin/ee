@@ -270,7 +270,7 @@ case $1 in
                         read -p "Do you wish to load backup version 1 right now? (Y/N) " yn
                         case $yn in
                             #! no s6 present ?!
-                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "1";;
+                            [Yy]* ) /bin/bash /app/data/scripts/load "1";;
                             [Nn]* ) echo && exit;;
                             * ) echo "-> Please answer yes or no.";;
                         esac
@@ -281,7 +281,7 @@ case $1 in
                         read -p "Do you wish to load backup version 2 right now? (Y/N) " yn
                         case $yn in
                             #! no s6 present ?!
-                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "2";;
+                            [Yy]* ) /bin/bash /app/data/scripts/load "2";;
                             [Nn]* ) echo && exit;;
                             * ) echo "-> Please answer yes or no.";;
                         esac
@@ -292,7 +292,7 @@ case $1 in
                         read -p "Do you wish to load backup version 3 right now? (Y/N) " yn
                         case $yn in
                             #! no s6 present ?!
-                            [Yy]* ) s6-setuidgid app /bin/bash /app/data/scripts/load "3";;
+                            [Yy]* ) /bin/bash /app/data/scripts/load "3";;
                             [Nn]* ) echo && exit;;
                             * ) echo "-> Please answer yes or no.";;
                         esac
