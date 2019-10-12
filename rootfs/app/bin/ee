@@ -17,7 +17,7 @@ case $1 in
         fi
 
     ;;
-    setup|conf|gepg)
+    setup|conf|run|gepg)
         /app/bin/cron-juggler-epg
     ;;
     cron)
