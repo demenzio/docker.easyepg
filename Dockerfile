@@ -44,6 +44,7 @@ RUN echo "**** upgrade system ****" && \
         cpanm install Time::Seconds && \
         cpanm install DateTime && \
         cpanm install DateTime::Format::DateParse && \
+        cpanm install DateTime::Format::Strptime && \
         cpanm install utf8
 
 ADD ${DOWN_LINK} ${BUILD_DIR}/
